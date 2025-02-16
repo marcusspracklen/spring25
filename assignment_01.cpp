@@ -35,13 +35,9 @@ int main() {
   // It has three variables i iterates through the uppercase letters, n iterates through the
   // lowercase letters, and j iterates through the values of the ASCII values from "A" to "z" so we
   // can label our outputs.
-  for (int i = (ASCII_VAL_A - ASCII_VAL_A), n = (ASCII_VAL_a - ASCII_VAL_A), j = ASCII_VAL_A;
-       i <= (ASCII_VAL_Z - ASCII_VAL_A); ++i, ++n, ++j) {
+  for (int i = 0, j = ASCII_VAL_A ; i < 26; ++i, ++j) {
     char letter_label = j;
-    int letter_count = 0;
-    // Adds together the upper and lowercase letters so we know the total number
-    letter_count = counter[i] + counter[n];
-
+    int letter_count = counter[i];
     // Calculates the percent that each letter appears in the whole input.
     //int percent = static_cast<int>(std::ceil((static_cast<double>(letter_count) / total_chars) * 100));
     int percent = (static_cast<double>(letter_count) / total_chars) * 100;
