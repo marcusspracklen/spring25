@@ -3,12 +3,13 @@
 
 int main() {
   constexpr int BUFFER_SIZE = 8192;
+  constexpr int ALPHABET_SIZE = 26;
   constexpr int ASCII_VAL_A = 'A';
   constexpr int ASCII_VAL_a = 'a';
   constexpr int ASCII_VAL_Z = 'Z';
   constexpr int ASCII_VAL_z = 'z';
 
-  int counter[26] = {0};
+  int counter[ALPHABET_SIZE] = {0};
   char input[BUFFER_SIZE];
   double total_chars = 0;
 
@@ -35,7 +36,7 @@ int main() {
   // It has three variables i iterates through the uppercase letters, n iterates through the
   // lowercase letters, and j iterates through the values of the ASCII values from "A" to "z" so we
   // can label our outputs.
-  for (int i = 0, j = ASCII_VAL_A ; i < 26; ++i, ++j) {
+  for (int i = 0, j = ASCII_VAL_A ; i < ALPHABET_SIZE; ++i, ++j) {
     char letter_label = j;
     int letter_count = counter[i];
     // Calculates the percent that each letter appears in the whole input.
