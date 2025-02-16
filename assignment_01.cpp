@@ -39,8 +39,7 @@ int main() {
     char letter_label = j;
     int letter_count = counter[i];
     // Calculates the percent that each letter appears in the whole input.
-    //int percent = static_cast<int>(std::ceil((static_cast<double>(letter_count) / total_chars) * 100));
-    int percent = (static_cast<double>(letter_count) / total_chars) * 100;
+    int percent = static_cast<int>(std::ceil((static_cast<double>(letter_count) / total_chars) * 100));
     // Checks to make sure that in the input the letter we are currently checking appeared.
     if (letter_count != 0) {
       std::cout << letter_label << " " << letter_count << " ";
