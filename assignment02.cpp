@@ -1,61 +1,50 @@
 #include <cctype>
 #include <iostream>
 #include <string>
+void counter(std::string &data) {
 
-int character_counter(std::string &data) {
-  int count = 0;
-  for (char c : data) {
-    if (std::isalpha(c)) {
-      count++;
-    }
-  }
+  int char_counter = 0;
+  int word_counter = 0;
+  int sent_coutner = 0;
 
-  return count;
-}
-
-int sentance_counter(std::string &data) {
-  int count = 0;
-  bool is_word = false;
-  for (size_t i = 0; i < data.length(); i++) {
-    if(isalpha(data[i])) {
-      is_word = true;
-    }
-    else if ((data[i] == '!' || data[i] == '.' || data[i] == '?') && is_word) {
-        count++;
-      is_word = false;
-    }
-  }
-
-  return count;
-}
-
-int word_count(std::string &data) {
-  int count = 0;
+  bool seen_space = false;
   bool in_word = false;
+ 
 
-  for (char c : data) {
-    if (isspace(c)) {
-      in_word = false;
-    } else if (!in_word && std::isalpha(c)) {
+  for (int i = 0; i < data.length(); ++i) {
+
+    if(std::isalpha(data[i])) {
+      ++char_counter;
       in_word = true;
-      count++;
+    }
+    else if(data[i] == ' ' || data[i] == '\n') {
+      seen_space = true;
+      if(in_word) {
+      ++word_counter;
+      in_word = false;
+      }
+    }
+    else if(data[i] == '.' || data[i] == '!' || data[i] == '?') {
+      if(in_word && seen_space) {
+        ++sent_coutner;
+        seen_space = false;
+      }
     }
   }
 
-  return count;
-}
+  std::cout << char_counter << " Characters" << "\n";
+  std::cout << word_counter << " Words" << "\n";
+  std::cout << sent_coutner << " Sentances" << "\n";
+;}
 
 int main() {
-  std::string text, token;
+std::string text;
+std::string token;
 
-  while (std::cin >> token) {
-    if (!text.empty()) {
-      text += " ";
-    }
-    text += token;
+ while (std::getline(std::cin, token)) {
+    text += token + " ";
   }
 
-  std::cout << "Characters: " << character_counter(text) << "\n";
-  std::cout << "Words: " << word_count(text) << "\n";
-  std::cout << "Sentances: " << sentance_counter(text) << "\n";
+  counter(text);
+ 
 }
