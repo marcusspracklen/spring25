@@ -11,7 +11,9 @@ std::vector<int> counter(std::string &data) {
   bool seen_space = false;
   bool in_word = false;
 
-  for (int i = 0; i < data.length(); ++i) {
+  int helper = data.length();
+
+  for (int i = 0; i < helper; ++i) {
     if (std::isalpha(data[i])) {
       ++char_counter;
       in_word = true;
@@ -44,11 +46,10 @@ void ARI_calc(std::vector<int> data) {
       std::ceil(4.71 * (static_cast<double>(data[0]) / static_cast<double>(data[1])) +
                 0.5 * (static_cast<double>(data[1]) / static_cast<double>(data[2])) - 21.43);
 
-    if(ARI_value > 14) {
+    if (ARI_value > 14 || ARI_value < 0) {
       std::cout << "ARI: " << ARI_value << " (Smarty-pants)"
             << "\n";
-    }
-    else {
+    } else {
   std::cout << "ARI: " << ARI_value << " (" << ARI_score[static_cast<int>(ARI_value) - 1] << ")"
             << "\n";
     }
