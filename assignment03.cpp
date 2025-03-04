@@ -22,14 +22,26 @@ int main() {
     return 0;
   }
 
-  auto max = std::max_element(input_vals.begin(), input_vals.end());
-  int max_index = std::distance(input_vals.begin(), max);
-  std::cout << "Maximum input value: " << *max << " on " << input_dates[max_index] << " at "
+  int max = input_vals[0], min = input_vals[0];
+  int max_index = 0, min_index = 0;
+
+
+  for (int i = 0; i < input_vals.size(); ++i) {
+    if (input_vals[i] > max) {
+      max = input_vals[i];
+      max_index = i;
+    }
+  }
+  std::cout << "Maximum input value: " << max << " on " << input_dates[max_index] << " at "
             << input_times[max_index] << "\n";
 
-  auto min = std::min_element(input_vals.begin(), input_vals.end());
-  int min_index = std::distance(input_vals.begin(), min);
-  std::cout << "Minimum input value: " << *min << " on " << input_dates[min_index] << " at "
+  for (int i = 0; i < input_vals.size(); ++i) {
+    if (input_vals[i] < min) {
+      min = input_vals[i];
+      min_index = i;
+    }
+  }
+  std::cout << "Minimum input value: " << min << " on " << input_dates[min_index] << " at "
             << input_times[min_index] << "\n";
 
   double sum = 0;
