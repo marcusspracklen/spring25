@@ -14,7 +14,7 @@ using namespace cs19_wordle;
 
 auto dictionary_maker() {
   std::vector<std::string> dict;
-  std::ifstream wordle_words("wordle_words.txt");
+  std::ifstream wordle_words("/srv/datasets/wordle_words.txt");
   std::string word;
 
   while (wordle_words >> word) {
@@ -34,6 +34,13 @@ int main(int argc, char** argv) {
   // Create a set that has all the words possible for our wordle game.
   std::vector<std::string> master_dictionary;
 
+  // std::ifstream wordle_words(argv[1]);
+  // std::string word;
+  // while (wordle_words >> word) {
+  //   master_dictionary.push_back(word);
+  // }
+  // wordle_words.close();
+
   // Use to check guesses right and wrong letters
   std::map<cs19_wordle::letter_status_t, const std::string> ansi_colors{
       {cs19_wordle::GREEN, "\033[1;30;42m"},
@@ -50,36 +57,37 @@ int main(int argc, char** argv) {
 
   int win_checker = 0;
 
-  int games_count = 100;
+  int games_count = 1;
+
+  cs19_wordle::Wordle game;
 
   master_dictionary = dictionary_maker();
 
-  for (int i = 0; i < games_count; ++i) {  // TESTING
-    // while (game_active) {
+    while (game_active) {
     std::vector<std::string> dictionary = master_dictionary;
-    cs19_wordle::Wordle game;
     std::string guess = "";
     assert(!dictionary.empty());
     int guess_max = 6;
     //std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
 
     
+      std::cout << "New game! " << games_count <<"\n";
+      ++games_count;
+    for (int guess_num = 0; guess_num < guess_max; ++guess_num) {
 
-    for (int guess_num = 1; guess_num < guess_max; ++guess_num) {
-
-      if(guess_num == 1)
+      if(guess_num == 0)
         guess = "AUDIO";
 
-      if(guess_num == 2) {
+      if(guess_num == 1) {
         guess = "SLEPT";
       }
 
       auto result = game.guess(guess);
 
 
-      if (game.wins() != 0) {
+      if (game.wins() > win_checker) {
         ++win_checker;
-        //std::cout << "I won" << std::endl;
+        std::cout << "I won " << game.total_games() << std::endl;
         break;
       }
 
@@ -164,12 +172,11 @@ int main(int argc, char** argv) {
 
       dictionary = new_vector;
 
-      std::uniform_int_distribution<size_t> dis(0, dictionary.size() - 1);
+     // std::uniform_int_distribution<size_t> dis(0, dictionary.size() - 1);
       //std::cout << "DICT SIZE " << dictionary.size() << std::endl;
       assert(!dictionary.empty());
-      auto next_guess = std::next(dictionary.begin(), dis(gen));
-      guess = *next_guess;
+      auto next_guess = dictionary[0];
+      guess = next_guess;
     }
   }
-  std::cout << win_checker << " " << games_count << std::endl;
 }
