@@ -7,6 +7,7 @@
 #include <map>
 #include <random>
 #include <unordered_set>
+#include <set>
 #include <vector>
 
 using namespace cs19_wordle;
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
 
       if (game.wins() > win_checker) {
         ++win_checker;
+        std::cout << "I won" << std::endl;
         break;
       }
 
@@ -75,7 +77,7 @@ int main(int argc, char** argv) {
     //   }
     //   std::cout << "\n";
 
-      std::vector<char> gray_letters;
+      std::set<char> gray_letters;
       std::vector<std::pair<char, int>> green_letters;
       std::vector<std::pair<char, int>> yellow_letters;
 
@@ -87,7 +89,24 @@ int main(int argc, char** argv) {
         } else if (result[i] == YELLOW) {
           yellow_letters.emplace_back(guess[i], i);
         } else if (result[i] == GRAY) {
-          gray_letters.push_back(guess[i]);
+          gray_letters.insert(guess[i]);
+        }
+      }
+
+      for(auto gray : gray_letters) {
+        for (auto [ch, pos] : green_letters) {
+          if ((gray) == (ch)) {
+            gray_letters.erase(gray);
+          } else {
+            ++gray;
+          }
+        }
+        for (auto [ch, pos] : yellow_letters) {
+          if ((gray) == (ch)) {
+            gray_letters.erase(gray);
+          } else {
+            ++gray;
+          }
         }
       }
 
@@ -106,6 +125,7 @@ int main(int argc, char** argv) {
         // Remove words that dont contain the green letter at the given position
         for (auto [ch, pos] : green_letters) {
           if ((*word_in_dict)[pos] != ch) {
+            std::cout << guess << " " << *word_in_dict << std::endl;
             valid = false;
             break;
           }
@@ -129,8 +149,8 @@ int main(int argc, char** argv) {
         }
       }
 
-      std::uniform_int_distribution<size_t> dis(1, dictionary.size() - 1);
-      std::cout << dictionary.size() << std::endl;
+      std::uniform_int_distribution<size_t> dis(0, dictionary.size() - 1);
+      std::cout << "DICT SIZE " << dictionary.size() << std::endl;
       assert(!dictionary.empty());
       auto next_guess = std::next(dictionary.begin(), dis(gen));
       guess = *next_guess;
