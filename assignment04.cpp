@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     // while (game_active) {
     std::unordered_set<std::string> dictionary = master_dictionary;
     cs19_wordle::Wordle game;
-    guess = "AUDIO";
+    guess = "CRANE";
     assert(!dictionary.empty());
     int guess_max = 6;
     //std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
@@ -110,24 +110,24 @@ int main(int argc, char** argv) {
       for (auto word_in_dict = dictionary.begin(); word_in_dict != dictionary.end();) {
         bool valid = true;
 
-        // Remove words that contain any gray letter
-        for (auto c : gray_letters) {
-          if ((*word_in_dict).find(c) != std::string::npos) {
-            valid = false;
-            //std::cout << "WIBBKE " << c << " " << *word_in_dict << std::endl;
-            break;
-          }
-        }
-
         // Remove words that dont contain the green letter at the given position
         if (valid == true) {
-        for (auto [ch, pos] : green_letters) {
-          if ((*word_in_dict)[pos] != ch) {
-            //std::cout << guess << " " << *word_in_dict << std::endl;
-            valid = false;
-            break;
-          }
-        }}
+          for (auto [ch, pos] : green_letters) {
+            if ((*word_in_dict)[pos] != ch) {
+              //std::cout << guess << " " << *word_in_dict << std::endl;
+              valid = false;
+              break;
+            }
+          }}  
+
+        // Remove words that contain any gray letter
+        for (auto c : gray_letters) {
+           if ((*word_in_dict).find(c) != std::string::npos) {
+             valid = false;
+             //std::cout << "WIBBKE " << c << " " << *word_in_dict << std::endl;
+             break;
+           }
+         }
 
         /* Remove words that
            1. Contain the letter at the given position
