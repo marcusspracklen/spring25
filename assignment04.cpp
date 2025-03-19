@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
   }
 
   // Create a set that has all the words possible for our wordle game.
-  std::unordered_set<std::string> dictionary;
+  std::unordered_set<std::string> master_dictionary;
 
   // Use to check guesses right and wrong letters
   std::map<cs19_wordle::letter_status_t, const std::string> ansi_colors{
@@ -41,7 +41,6 @@ int main(int argc, char** argv) {
       {cs19_wordle::GRAY, "\033[1;30;243m"},
       {cs19_wordle::ERROR, "\033[1;30;41m"}};
 
-  cs19_wordle::Wordle game;
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -53,22 +52,25 @@ int main(int argc, char** argv) {
 
   int win_checker = 0;
 
-  int games_count = 3;
+  int games_count = 50;
+
+  master_dictionary = dictionary_maker();
 
   for (int i = 0; i < games_count; ++i) {  // TESTING
     // while (game_active) {
-    dictionary = dictionary_maker();
+    std::unordered_set<std::string> dictionary = master_dictionary;
+    cs19_wordle::Wordle game;
     guess = "AUDIO";
     assert(!dictionary.empty());
     int guess_max = 6;
-    std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
+    //std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
 
     for (int guess_num = 1; guess_num < guess_max; ++guess_num) {
       auto result = game.guess(guess);
 
-      std::cout << guess_num << " " << guess << std::endl;
+      //std::cout << guess_num << " " << guess << std::endl;
 
-      if (game.wins() > win_checker) {
+      if (game.wins() != 0) {
         ++win_checker;
         //std::cout << "I won" << std::endl;
         break;
@@ -95,6 +97,8 @@ int main(int argc, char** argv) {
         }
       }
 
+        // Looks to see if a letter has already appeared as a yellow or green
+        // and removes it from the gray letter vector if it has.      
         for (auto [ch, pos] : green_letters) {
             gray_letters.erase(ch);
           
@@ -116,23 +120,25 @@ int main(int argc, char** argv) {
         }
 
         // Remove words that dont contain the green letter at the given position
+        if (valid == true) {
         for (auto [ch, pos] : green_letters) {
           if ((*word_in_dict)[pos] != ch) {
             //std::cout << guess << " " << *word_in_dict << std::endl;
             valid = false;
             break;
           }
-        }
+        }}
 
         /* Remove words that
            1. Contain the letter at the given position
            2. Dont contain the letter */
+        if (valid == true) {
         for (auto [ch, pos] : yellow_letters) {
           if ((*word_in_dict)[pos] == ch || (*word_in_dict).find(ch) == std::string::npos) {
             valid = false;
             break;
           }
-        }
+        }}
 
         //std::cout << *word_in_dict << " " << valid << std::endl;
         if (!valid) {
