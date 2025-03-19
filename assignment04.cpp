@@ -6,11 +6,9 @@
 #include <iostream>
 #include <map>
 #include <random>
-#include <unordered_set>
 #include <set>
+#include <unordered_set>
 #include <vector>
-
-using namespace cs19_wordle;
 
 auto dictionary_maker() {
   std::vector<std::string> dict;
@@ -31,15 +29,8 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  // Create a set that has all the words possible for our wordle game.
+  // Create a master set that has all the words possible for our wordle game.
   std::vector<std::string> master_dictionary;
-
-  // std::ifstream wordle_words(argv[1]);
-  // std::string word;
-  // while (wordle_words >> word) {
-  //   master_dictionary.push_back(word);
-  // }
-  // wordle_words.close();
 
   // Use to check guesses right and wrong letters
   std::map<cs19_wordle::letter_status_t, const std::string> ansi_colors{
@@ -48,46 +39,41 @@ int main(int argc, char** argv) {
       {cs19_wordle::GRAY, "\033[1;30;243m"},
       {cs19_wordle::ERROR, "\033[1;30;41m"}};
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
   bool game_active = true;
-  bool game_won = false;
-
 
   int win_checker = 0;
-
-  int games_count = 1;
 
   cs19_wordle::Wordle game;
 
   master_dictionary = dictionary_maker();
 
-    while (game_active) {
+  int game_zz = 0;
+
+
+  while (game_active) {
     std::vector<std::string> dictionary = master_dictionary;
     std::string guess = "";
     assert(!dictionary.empty());
     int guess_max = 6;
-    //std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
-
     
-      std::cout << "New game! " << games_count <<"\n";
-      ++games_count;
+    //std::cout << game.wins() << " " << game.total_games() << "\n";
+
     for (int guess_num = 0; guess_num < guess_max; ++guess_num) {
+      if (guess_num == 0) guess = "AUDIO";
 
-      if(guess_num == 0)
-        guess = "AUDIO";
-
-      if(guess_num == 1) {
+      if (guess_num == 1) {
         guess = "SLEPT";
       }
 
       auto result = game.guess(guess);
 
-
-      if (game.wins() > win_checker) {
-        ++win_checker;
-        std::cout << "I won " << game.total_games() << std::endl;
+      // if (game.wins() > win_checker) {
+      //   ++win_checker;
+      //   std::cout << "I won " << game.total_games() << "\n";
+      //   break;
+      // }
+      if (game.total_games() > game_zz) {
+        game_zz ++;
         break;
       }
 
@@ -95,66 +81,65 @@ int main(int argc, char** argv) {
       std::vector<std::pair<char, int>> green_letters;
       std::vector<std::pair<char, int>> yellow_letters;
 
-      // Look at our dictinary set and exclude any words that don't have a green letter
-      // Where we want word_in_dict, include a yellow letter, and don't include any of our gray letters.
       for (int i = 0; i < 5; ++i) {
-        if (result[i] == GREEN) {
+        if (result[i] == cs19_wordle::GREEN) {
           green_letters.emplace_back(guess[i], i);
-        } else if (result[i] == YELLOW) {
+        } else if (result[i] == cs19_wordle::YELLOW) {
           yellow_letters.emplace_back(guess[i], i);
-        } else if (result[i] == GRAY) {
+        } else if (result[i] == cs19_wordle::GRAY) {
           gray_letters.insert(guess[i]);
         }
       }
 
-        // Looks to see if a letter has already appeared as a yellow or green
-        // and removes it from the gray letter vector if it has.      
-        for (auto [ch, pos] : green_letters) {
-            gray_letters.erase(ch);
-          
-        }
-        for (auto [ch, pos] : yellow_letters) {
-            gray_letters.erase(ch);
+      // Looks to see if a letter has already appeared
+      // as a yellow or green
+      // and removes it from the gray letter vector if it has.
+      for (auto [ch, pos] : green_letters) {
+        gray_letters.erase(ch);
+      }
+      for (auto [ch, pos] : yellow_letters) {
+        gray_letters.erase(ch);
       }
 
       std::vector<std::string> new_vector;
 
       int count = 0;
-      for (auto word_in_dict = dictionary.begin(); word_in_dict != dictionary.end(); word_in_dict++) {
+      for (auto word_in_dict = dictionary.begin(); word_in_dict != dictionary.end();
+           word_in_dict++) {
         bool valid = true;
 
         count += 1;
 
         std::string current_word = *word_in_dict;
 
-        //std::cout << count << std::endl;
-        // Remove words that dont contain the green letter at the given position
-          for (auto [ch, pos] : green_letters) {
-            if (current_word[pos] != ch) {
-              valid = false;
-              break;
-            }
+        // Remove words that dont contain the
+        // green letter at the given position
+        for (auto [ch, pos] : green_letters) {
+          if (current_word[pos] != ch) {
+            valid = false;
+            break;
           }
-          
-        if (valid == false){
-          continue;
         }
-
-        // Remove words that contain any gray letter
-        for (auto c : gray_letters) {
-           if (current_word.find(c) != std::string::npos) {
-             valid = false;
-             break;
-           }
-         }
 
         if (valid == false) {
           continue;
         }
 
-        /* Remove words that
-           1. Contain the letter at the given position
-           2. Dont contain the letter */
+        // Remove words that contain any gray letter
+        for (auto c : gray_letters) {
+          if (current_word.find(c) != std::string::npos) {
+            valid = false;
+            break;
+          }
+        }
+
+        if (valid == false) {
+          continue;
+        }
+
+        // Remove words that
+        // 1. Contain the letter at the given position
+        // 2. Dont contain the letter
         for (auto [ch, pos] : yellow_letters) {
           if (current_word[pos] == ch || current_word.find(ch) == std::string::npos) {
             valid = false;
@@ -166,14 +151,11 @@ int main(int argc, char** argv) {
           continue;
         }
 
-        //std::cout << *word_in_dict << " " << valid << std::endl;
         new_vector.push_back(current_word);
       }
 
       dictionary = new_vector;
 
-     // std::uniform_int_distribution<size_t> dis(0, dictionary.size() - 1);
-      //std::cout << "DICT SIZE " << dictionary.size() << std::endl;
       assert(!dictionary.empty());
       auto next_guess = dictionary[0];
       guess = next_guess;
