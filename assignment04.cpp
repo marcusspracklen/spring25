@@ -47,8 +47,6 @@ int main(int argc, char** argv) {
   bool game_active = true;
   bool game_won = false;
 
-  // First guess
-  std::string guess = "AUDIO";
 
   int win_checker = 0;
 
@@ -60,13 +58,24 @@ int main(int argc, char** argv) {
     // while (game_active) {
     std::vector<std::string> dictionary = master_dictionary;
     cs19_wordle::Wordle game;
-    guess = "CRANE";
+    std::string guess = "";
     assert(!dictionary.empty());
     int guess_max = 6;
     //std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
 
+    
+
     for (int guess_num = 1; guess_num < guess_max; ++guess_num) {
+
+      if(guess_num == 1)
+        guess = "AUDIO";
+
+      if(guess_num == 2) {
+        guess = "SLEPT";
+      }
+
       auto result = game.guess(guess);
+
 
       if (game.wins() != 0) {
         ++win_checker;
@@ -107,11 +116,13 @@ int main(int argc, char** argv) {
         bool valid = true;
 
         count += 1;
+
+        std::string current_word = *word_in_dict;
+
         //std::cout << count << std::endl;
         // Remove words that dont contain the green letter at the given position
           for (auto [ch, pos] : green_letters) {
-            if ((*word_in_dict)[pos] != ch) {
-              //std::cout << guess << " " << *word_in_dict << std::endl;
+            if (current_word[pos] != ch) {
               valid = false;
               break;
             }
@@ -123,9 +134,8 @@ int main(int argc, char** argv) {
 
         // Remove words that contain any gray letter
         for (auto c : gray_letters) {
-           if ((*word_in_dict).find(c) != std::string::npos) {
+           if (current_word.find(c) != std::string::npos) {
              valid = false;
-             //std::cout << "WIBBKE " << c << " " << *word_in_dict << std::endl;
              break;
            }
          }
@@ -138,7 +148,7 @@ int main(int argc, char** argv) {
            1. Contain the letter at the given position
            2. Dont contain the letter */
         for (auto [ch, pos] : yellow_letters) {
-          if ((*word_in_dict)[pos] == ch || (*word_in_dict).find(ch) == std::string::npos) {
+          if (current_word[pos] == ch || current_word.find(ch) == std::string::npos) {
             valid = false;
             break;
           }
@@ -149,7 +159,7 @@ int main(int argc, char** argv) {
         }
 
         //std::cout << *word_in_dict << " " << valid << std::endl;
-        new_vector.push_back(*word_in_dict);
+        new_vector.push_back(current_word);
       }
 
       dictionary = new_vector;
