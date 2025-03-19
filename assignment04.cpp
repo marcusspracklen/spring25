@@ -53,13 +53,15 @@ int main(int argc, char** argv) {
 
   int win_checker = 0;
 
-  for (int i = 0; i < 1; ++i) {  // TESTING
+  int games_count = 3;
+
+  for (int i = 0; i < games_count; ++i) {  // TESTING
     // while (game_active) {
     dictionary = dictionary_maker();
     guess = "AUDIO";
     assert(!dictionary.empty());
     int guess_max = 6;
-    std::cout << game.wins();
+    std::cout << "WON " << game.wins() << " " << dictionary.size() << std::endl;
 
     for (int guess_num = 1; guess_num < guess_max; ++guess_num) {
       auto result = game.guess(guess);
@@ -68,7 +70,7 @@ int main(int argc, char** argv) {
 
       if (game.wins() > win_checker) {
         ++win_checker;
-        std::cout << "I won" << std::endl;
+        //std::cout << "I won" << std::endl;
         break;
       }
 
@@ -93,21 +95,12 @@ int main(int argc, char** argv) {
         }
       }
 
-      for(auto gray : gray_letters) {
         for (auto [ch, pos] : green_letters) {
-          if ((gray) == (ch)) {
-            gray_letters.erase(gray);
-          } else {
-            ++gray;
-          }
+            gray_letters.erase(ch);
+          
         }
         for (auto [ch, pos] : yellow_letters) {
-          if ((gray) == (ch)) {
-            gray_letters.erase(gray);
-          } else {
-            ++gray;
-          }
-        }
+            gray_letters.erase(ch);
       }
 
       for (auto word_in_dict = dictionary.begin(); word_in_dict != dictionary.end();) {
@@ -125,7 +118,7 @@ int main(int argc, char** argv) {
         // Remove words that dont contain the green letter at the given position
         for (auto [ch, pos] : green_letters) {
           if ((*word_in_dict)[pos] != ch) {
-            std::cout << guess << " " << *word_in_dict << std::endl;
+            //std::cout << guess << " " << *word_in_dict << std::endl;
             valid = false;
             break;
           }
@@ -150,10 +143,11 @@ int main(int argc, char** argv) {
       }
 
       std::uniform_int_distribution<size_t> dis(0, dictionary.size() - 1);
-      std::cout << "DICT SIZE " << dictionary.size() << std::endl;
+      //std::cout << "DICT SIZE " << dictionary.size() << std::endl;
       assert(!dictionary.empty());
       auto next_guess = std::next(dictionary.begin(), dis(gen));
       guess = *next_guess;
     }
   }
+  std::cout << win_checker << " " << games_count << std::endl;
 }
