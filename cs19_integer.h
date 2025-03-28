@@ -1,13 +1,14 @@
-#pragma once
+#ifndef cs19_integer
+#define cs19_integer
 
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
-#include <iostream> // For debugging purposes
+#include <iostream>
 
-namespace cs19s25 {
+namespace cs19 {
 
 struct Integer {
     // Construct from string with error checking
@@ -73,7 +74,6 @@ struct Integer {
         // Loop until both vectors are empty and no carry
         while (i < digits.size() || i < other.digits.size() || carry) {
 
-
             int left_digit;
             if (i < digits.size()){
                 left_digit = digits[i];
@@ -111,3 +111,5 @@ struct Integer {
 };
 
 } // namespace cs19
+
+#endif
