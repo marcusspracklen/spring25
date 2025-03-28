@@ -1,115 +1,49 @@
-#ifndef cs19_integer
-#define cs19_integer
-
-#include <string>
-#include <vector>
 #include <algorithm>
-#include <stdexcept>
-#include <limits>
-#include <iostream>
+#include <vector>
+#include <string>
 
 namespace cs19 {
+ 
+    struct Integer {
+     
+      // Decide on your data member(s).
+      std::vector<int> nums;
 
-struct Integer {
-    // Construct from string with error checking
-    Integer(const std::string& input) {
-        if (input.empty()) {
-            throw std::invalid_argument("Input string cannot be empty.");
+      Integer(const std::string &input){
+        for (int i = input.size(); i < 0; i--) {
+            nums.push_back(input[i]);
         }
+      }
+     
+      operator double() const {
+        double result = 0;
 
-        // Remove leading zeros 
-        size_t first_non_zero = input.find_first_not_of('0');
-        if (first_non_zero == std::string::npos) { 
-            digits = {0}; // If all zeros, store zero
-            return;
+        for(int i = 0; i < nums.size(); i++) {
+            result += nums[i];
         }
-
-        // Validate digits
-        if (!std::all_of(input.begin(), input.end(), ::isdigit)) {
-            throw std::invalid_argument("Input must only contain digits.");
-        }
-
-        // Store digits in reverse for easier arithmetic
-        digits.reserve(input.size());
-        for (auto it = input.rbegin(); it != input.rend(); ++it) {
-            digits.push_back(*it - '0');
-        }
-    }
-
-    // Convert to double (approximation with overflow check)
-    operator double() const {
-        double value = 0.0;
-        double place_value = 1.0;
-
-        for (int digit : digits) {
-            value += digit * place_value;
-            if (value > std::numeric_limits<double>::max() / 10) { 
-                // Overflow check
-                std::cerr << "Warning: Double overflow detected!" << std::endl;
-                return std::numeric_limits<double>::infinity(); 
-            }
-            place_value *= 10.0;
-        }
-        return value;
-    }
-
-    // Convert to string
-    operator std::string() const {
-        if (digits.empty()) return "0";
-
+        return result;  // TODO: return the closest approximation to this integer, as a `double`
+      }
+     
+      operator std::string() const {
         std::string result;
-        result.reserve(digits.size());
-        for (auto it = digits.rbegin(); it != digits.rend(); ++it) {
-            result += static_cast<char>(*it + '0');
+
+        for (int i = 0; i < nums.size(); i++) {
+            result = std::to_string(nums[i]);
         }
-        return result;
-    }
+        return result;  // TODO: return a string containing the digits in this integer
+      }
+     
+      Integer operator+(const Integer &that) const {
+        std::string sum;
+        int term_1 = ;
+        int term_2 = that;
 
-    // Addition operator
-    Integer operator+(const Integer& other) const {
-        std::vector<int> sum_digits;
-        int carry = 0;
-        size_t i = 0;
 
-        // Loop until both vectors are empty and no carry
-        while (i < digits.size() || i < other.digits.size() || carry) {
 
-            int left_digit;
-            if (i < digits.size()){
-                left_digit = digits[i];
-            }
-            else {
-                left_digit = 0;
-            }
-
-            int right_digit;
-            if (i < other.digits.size()) {
-                right_digit = other.digits[i];
-            } 
-            else {
-                right_digit = 0;
-            }
-
-            int total = left_digit + right_digit + carry;
-            sum_digits.push_back(total % 10);
-            carry = total / 10;
-            ++i;
-        }
-
-        return Integer(std::move(sum_digits));
-    }
-
-    // Equality operator
-    bool operator==(const Integer& other) const {
-        return digits == other.digits;
-    }
-
-    std::vector<int> digits;
-
-    // Avoid duplication
-    Integer(std::vector<int>&& digit_vector) : digits(std::move(digit_vector)) {}
-};
-
-} // namespace cs19
-
-#endif
+        
+        return {"0"};  // TODO: return the sum of this integer and that integer as a new integer
+      }
+     
+    };
+     
+    }  // namespace cs19
