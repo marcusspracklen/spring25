@@ -64,18 +64,6 @@ struct Integer {
         return result;
     }
 
-    // Less than operator
-    bool operator<(const Integer& other) const {
-        if (digits.size() != other.digits.size()) {
-            return digits.size() < other.digits.size();
-        }
-        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin();
-             it1 != digits.rend(); ++it1, ++it2) {
-            if (*it1 != *it2) return *it1 < *it2;
-        }
-        return false;
-    }
-
     // Addition operator
     Integer operator+(const Integer& other) const {
         std::vector<int> sum_digits;
