@@ -11,7 +11,7 @@ namespace cs19s25 {
 
 struct Integer {
     // Construct from string with error checking
-    explicit Integer(const std::string& input) {
+    Integer(const std::string& input) {
         if (input.empty()) {
             throw std::invalid_argument("Input string cannot be empty.");
         }
@@ -36,7 +36,7 @@ struct Integer {
     }
 
     // Convert to double (approximation with overflow check)
-    explicit operator double() const {
+    operator double() const {
         double value = 0.0;
         double place_value = 1.0;
 
@@ -53,7 +53,7 @@ struct Integer {
     }
 
     // Convert to string
-    explicit operator std::string() const {
+    operator std::string() const {
         if (digits.empty()) return "0";
 
         std::string result;
@@ -84,8 +84,23 @@ struct Integer {
 
         // Loop until both vectors are empty and no carry
         while (i < digits.size() || i < other.digits.size() || carry) {
-            int left_digit = (i < digits.size()) ? digits[i] : 0;
-            int right_digit = (i < other.digits.size()) ? other.digits[i] : 0;
+
+
+            int left_digit;
+            if (i < digits.size()){
+                left_digit = digits[i];
+            }
+            else {
+                left_digit = 0;
+            }
+
+            int right_digit;
+            if (i < other.digits.size()) {
+                right_digit = other.digits[i];
+            } 
+            else {
+                right_digit = 0;
+            }
 
             int total = left_digit + right_digit + carry;
             sum_digits.push_back(total % 10);
@@ -104,8 +119,7 @@ struct Integer {
     std::vector<int> digits;
 
     // Avoid duplication
-    explicit Integer(std::vector<int>&& digit_vector) 
-        : digits(std::move(digit_vector)) {}
+    Integer(std::vector<int>&& digit_vector) : digits(std::move(digit_vector)) {}
 };
 
 } // namespace cs19
