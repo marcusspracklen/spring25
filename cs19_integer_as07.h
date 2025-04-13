@@ -76,26 +76,39 @@ std::vector<int> nums;
         std::string result;
         int biggest_num = std::max(nums.size(), that.nums.size());
 
-        for(int i = 0; i < biggest_num; ++i) {
-            int num0 = 0;
-            int num1 = 0;
-            int num0_length = nums.size();
-            int num1_length = that.nums.size();
-            if (i < num0_length) {
-                num0 = nums[i];
-            }
-            if (i < num1_length) {
-                num1 = that.nums[i];
+        bool first_time = true;
+        bool gonna_be_negative = false;
+
+        for(int i = biggest_num - 1; i <= 0; --i) {
+            int num0 = nums[i];
+            int num1 = that.nums[i];
+            // int num0_length = nums.size();
+            // int num1_length = that.nums.size();
+            // if (i < num0_length) {
+            //     num0 = nums[i];
+            // }
+            // if (i < num1_length) {
+            //     num1 = that.nums[i];
+            // }
+
+            
+                int checker = num0 - num1;
+            if(checker < 0) {
+                num0 = num1;
+                num1 = num0;
+                first_time = false;
+                gonna_be_negative = true;
             }
 
-            int difference = num0 - num1 - borrow;
+            int difference = num0 - num1;
 
-            if(difference < 0) {
-                difference += 10;
-                borrow = 1;
-            } else {
-                borrow = 0;
-            }
+                if(num0 - num1 <= 0) {
+                    difference += 10;
+                    borrow = 1;
+             } else {
+                    borrow = 0;
+             }
+
 
             minus_result.push_back(difference);
         }
@@ -114,6 +127,11 @@ std::vector<int> nums;
 
         // The vector minus_result is backwards so we have to iterate across it in reverse to get the right number
         for(int i = minus_result.size() - 1; i >= 0; i--) {
+            if(i = 0) {
+                if(gonna_be_negative) {
+                minus_result[i] = minus_result[i] * (-1);
+                }
+            }
             result.push_back(minus_result[i] + '0');
         }
 
@@ -121,8 +139,40 @@ std::vector<int> nums;
     }
 
     Integer operator*(const Integer &that) const {
+        std::vector<int> mulpt_result; 
+        int carry = 0;
+        std::string result;
+        int biggest_num = std::max(nums.size(), that.nums.size());
 
-        
+
+        for(int i = 0; i < biggest_num; i++) {
+            int num0 = 0;
+            int num1 = 0;
+            int num0_length = nums.size();
+            int num1_length = that.nums.size();
+
+            if(i < num0_length) {
+                num0 = nums[i];
+            }
+            if(i < num1_length) {
+                num1 = that.nums[i];
+            }
+
+            int product = (num0 * num1) + carry;
+            mulpt_result.push_back(product % 10);
+            carry = product / 10;
+        }
+
+        if(carry != 0 ) {
+            mulpt_result.push_back(carry);
+        }
+
+        for(int i = mulpt_result.size() - 1; i >= 0; i--) {
+            result.push_back(mulpt_result[i] + '0');
+        }
+
+
+        return Integer(result);
     }
 
     bool operator==(const Integer &that) {
