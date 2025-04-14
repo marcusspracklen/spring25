@@ -9,10 +9,21 @@
 namespace cs19 {
 struct Integer {
 std::vector<int> nums;
+bool is_negative = false;
+
 
     Integer(const std::string &input){
         for (int i = input.size() - 1; i >= 0; i--) {
-            nums.push_back(input[i] - '0');
+            if(!std::isdigit(input[i])) {
+                if(input[i] == '-') {
+                    is_negative = true;
+                } else {
+                    std::cerr << "ERROR: Unkown character entered." << "\n";
+                }
+            }
+            else{
+                nums.push_back(input[i] - '0');
+            }
         }
     }
 
@@ -25,15 +36,25 @@ std::vector<int> nums;
             column = column * 10;
         }
 
+        if(is_negative) {
+            result *= (-1);
+        }
+
         return result;
     }
 
     operator std::string() const {
         std::string result;
 
+        if(is_negative) {
+            result.push_back('-');
+        }
+
         for (int i = nums.size() - 1; i >= 0; i--) {
             result.push_back(nums[i] + '0');
         }
+
+        
         return result;
     }
 
@@ -79,17 +100,17 @@ std::vector<int> nums;
         bool first_time = true;
         bool gonna_be_negative = false;
 
-        for(int i = biggest_num - 1; i <= 0; --i) {
+        for(int i = biggest_num - 1; i >= 0; --i) {
             int num0 = nums[i];
             int num1 = that.nums[i];
-            // int num0_length = nums.size();
-            // int num1_length = that.nums.size();
-            // if (i < num0_length) {
-            //     num0 = nums[i];
-            // }
-            // if (i < num1_length) {
-            //     num1 = that.nums[i];
-            // }
+            int num0_length = nums.size();
+            int num1_length = that.nums.size();
+            if (i < num0_length) {
+                num0 = nums[i];
+            }
+            if (i < num1_length) {
+                num1 = that.nums[i];
+            }
 
             
                 int checker = num0 - num1;
