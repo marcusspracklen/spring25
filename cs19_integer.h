@@ -60,7 +60,7 @@ mutable bool is_negative = false;
             result.push_back(nums[i] + '0');
         }
 
-        return result;
+        return Integer(result);
     }
 
     Integer operator+(const Integer &that) const {
@@ -187,6 +187,10 @@ mutable bool is_negative = false;
             minus_result.push_back(borrow);
         }
 
+        while (minus_result.size() > 1 && minus_result.back() == 0) {
+            minus_result.pop_back();
+        }
+
         if(gonna_be_neg) {
             result.push_back('-');
         }
@@ -204,7 +208,7 @@ mutable bool is_negative = false;
         if(!(nums.size() == 1 && nums[0] == 0)) {
             result.is_negative = !is_negative;
         }
-        return result;
+        return Integer(result);
     }
 
     Integer operator*(const Integer &that) const {
@@ -298,10 +302,11 @@ mutable bool is_negative = false;
             return true;
         }
 
-        if(this->is_negative == that.is_negative) {
+        if(this->is_negative) {
             for(int i = nums.size() - 1; i >= 0; i--) {
                 if(nums[i] != that.nums[i]) {
                     is_less = nums[i] > that.nums[i];
+                    break;
                 }
             }
 
@@ -310,6 +315,7 @@ mutable bool is_negative = false;
         for(int i = nums.size() - 1; i >= 0; i--) {
             if(nums[i] != that.nums[i]) {
                 is_less = nums[i] < that.nums[i];
+                break;
             }
         }
     }
@@ -346,19 +352,19 @@ mutable bool is_negative = false;
             return true;
         }
 
-        if(this->is_negative == that.is_negative) {
-
+        if(this->is_negative) {
             for(int i = nums.size() - 1; i >= 0; i--) {
                 if(nums[i] != that.nums[i]) {
                     is_greater = nums[i] < that.nums[i];
+                    break;
                 }
             }
 
-        }else {
-
+        } else {
         for(int i = nums.size() - 1; i >= 0; i--) {
             if(nums[i] != that.nums[i]) {
                 is_greater = nums[i] > that.nums[i];
+                break;
             }
         }
 
