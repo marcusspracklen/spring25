@@ -9,8 +9,18 @@
 namespace cs19 {
 struct Integer {
 std::vector<int> nums;
-bool is_negative = false;
+mutable bool is_negative = false;
 
+
+    Integer() {
+        nums.push_back(0);
+        is_negative = false;
+    }
+
+    Integer(const Integer &that) {
+        nums = that.nums;
+        is_negative = that.is_negative;
+    }
 
     Integer(const std::string &input){
         for (int i = input.size() - 1; i >= 0; i--) {
@@ -54,7 +64,7 @@ bool is_negative = false;
             result.push_back(nums[i] + '0');
         }
 
-        
+
         return result;
     }
 
@@ -63,6 +73,8 @@ bool is_negative = false;
         int carry = 0;
         std::string result;
         int biggest_num = std::max(nums.size(), that.nums.size());
+
+        std::cout << *this << " " << that << "\n";
 
         for (int i = 0; i < biggest_num; i++) {
             int num0 = 0;
@@ -88,6 +100,8 @@ bool is_negative = false;
             result.push_back(add_result[i] + '0');
         }
 
+        std::cout << result << " " << "\n";
+
         return Integer(result);
     }
 
@@ -96,15 +110,38 @@ bool is_negative = false;
         int borrow = 0;
         std::string result;
         int biggest_num = std::max(nums.size(), that.nums.size());
+        bool gonna_be_neg = false;
+        bool invert = false;
 
-        bool first_time = true;
-        bool gonna_be_negative = false;
+        if(this->nums > that.nums) {
+            invert = true;
+        }
 
-        for(int i = biggest_num - 1; i >= 0; --i) {
-            int num0 = nums[i];
-            int num1 = that.nums[i];
+        if (this->is_negative && !that.is_negative) {
+            is_negative = false;
+            auto abs_this = *this;
+            auto abs_that = that;
+            std::string result = abs_this + abs_that;
+
+            result.push_back('-');
+            return Integer(result);
+        }
+
+        if(that.is_negative) {
+            auto abs_this = *this;
+            auto abs_that = that;
+            std::string result = abs_this + abs_that;
+
+            return Integer(result);
+        }
+
+
+        for (int i = 0; i < biggest_num; ++i) {
+            int num0 = 0;
+            int num1 = 0;
             int num0_length = nums.size();
             int num1_length = that.nums.size();
+
             if (i < num0_length) {
                 num0 = nums[i];
             }
@@ -112,143 +149,220 @@ bool is_negative = false;
                 num1 = that.nums[i];
             }
 
-            
-                int checker = num0 - num1;
-            if(checker < 0) {
-                num0 = num1;
-                num1 = num0;
-                first_time = false;
-                gonna_be_negative = true;
+            int difference;
+
+            if(invert) {
+                gonna_be_neg = true;
+                difference = num1 - num0 - borrow;
+            } else {
+                difference = num0 - num1 - borrow;
             }
 
-            int difference = num0 - num1;
-
-                if(num0 - num1 <= 0) {
-                    difference += 10;
-                    borrow = 1;
-             } else {
-                    borrow = 0;
-             }
-
+            // Checks to see if num1 was bigger than num0 and if so "borrows" a 10 from the next place
+            if(difference < 0) {
+                difference += 10;
+                borrow = 1;
+            } else {
+                borrow = 0;
+            }
 
             minus_result.push_back(difference);
         }
 
+
+        // Add any extra borrowing we had left over
         if(borrow != 0) {
             minus_result.push_back(borrow);
         }
 
-        // Removes any leading zeros
-        for(int i = 0; i < minus_result.size(); i++) {
-            if(minus_result[i] == 0) {
-                minus_result.erase(minus_result.begin() + i);
-            }
-
+        if(gonna_be_neg) {
+            result.push_back('-');
         }
 
         // The vector minus_result is backwards so we have to iterate across it in reverse to get the right number
         for(int i = minus_result.size() - 1; i >= 0; i--) {
-            if(i = 0) {
-                if(gonna_be_negative) {
-                minus_result[i] = minus_result[i] * (-1);
-                }
-            }
             result.push_back(minus_result[i] + '0');
         }
 
         return Integer(result);
     }
 
-    Integer operator*(const Integer &that) const {
-        std::vector<int> mulpt_result; 
-        int carry = 0;
-        std::string result;
-        int biggest_num = std::max(nums.size(), that.nums.size());
-
-
-        for(int i = 0; i < biggest_num; i++) {
-            int num0 = 0;
-            int num1 = 0;
-            int num0_length = nums.size();
-            int num1_length = that.nums.size();
-
-            if(i < num0_length) {
-                num0 = nums[i];
-            }
-            if(i < num1_length) {
-                num1 = that.nums[i];
-            }
-
-            int product = (num0 * num1) + carry;
-            mulpt_result.push_back(product % 10);
-            carry = product / 10;
+    Integer operator-() const {
+        Integer result = *this;
+        if(!(nums.size() == 1 && nums[0] == 0)) {
+            result.is_negative = !is_negative;
         }
-
-        if(carry != 0 ) {
-            mulpt_result.push_back(carry);
-        }
-
-        for(int i = mulpt_result.size() - 1; i >= 0; i--) {
-            result.push_back(mulpt_result[i] + '0');
-        }
-
-
-        return Integer(result);
+        return result;
     }
 
-    bool operator==(const Integer &that) {
+    Integer operator*(const Integer &that) const {
+        // Makes sure neither number is 0
+        if ((nums.size() == 1 && nums[0] == 0) || (that.nums.size() == 1 && that.nums[0] == 0)) {
+            return Integer("0");
+        }
+
+        int result_size = nums.size() + that.nums.size();
+        std::vector<int> times_result(result_size, 0);
+
+        // Loop multiplies every digit of this to every digit of that
+        for (size_t i = 0; i < nums.size(); ++i) {
+            int carry = 0;
+            for (size_t j = 0; j < that.nums.size(); ++j) {
+                // Adds the current sum to the new product
+                int product = times_result[i + j] + nums[i] * that.nums[j] + carry;
+                times_result[i + j] = product % 10;
+                carry = product / 10;
+            }
+
+            // If there is any remaining carry value add it to the result
+            if(carry > 0) {
+                times_result[i + that.nums.size()] += carry;
+            }
+        }
+
+        // Checks for and removes any leading zeros
+        while (times_result.size() > 1 && times_result.back() == 0) {
+            times_result.pop_back();
+        }
+
+        // Converts digits to a string
+        std::string result;
+        for (int i = times_result.size() - 1; i >= 0; --i) {
+            result.push_back(times_result[i] + '0');
+        }
+
+        // Handles negatives, the result can only be negative if only one of the nums is negative
+        Integer final_result(result);
+        final_result.is_negative = (is_negative != that.is_negative);
+        return final_result;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Integer& value) {
+        os << static_cast<std::string>(value);
+        return os;
+    }
+
+    bool operator==(const Integer &that) const {
         bool is_equal;
+        if(this->is_negative != that.is_negative) {
+            return false;
+        }
+
         is_equal = nums == that.nums;
 
         return is_equal;
     }
 
     bool operator!=(const Integer &that) {
-        bool is_equal;
-        is_equal = nums != that.nums;
+        bool not_equal;
+        if(this->is_negative != that.is_negative) {
+            return true;
+        }
 
-        return is_equal;
+        if(nums == that.nums) {
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
     bool operator<(const Integer &that) {
         bool is_less;
 
-        is_less = nums < that.nums;
+        if(this->is_negative != that.is_negative) {
+            if(this->is_negative && !that.is_negative) {
+                return true;
+            }
+            else if(!this->is_negative && that.is_negative) {
+                return false;
+            }
+        } 
+
+        if(nums.size() > that.nums.size()) {
+            return false;
+        }
+        if(nums.size() < that.nums.size()) {
+            return true;
+        }
+
+        if(this->is_negative == that.is_negative) {
+            for(int i = nums.size() - 1; i >= 0; i--) {
+                if(nums[i] != that.nums[i]) {
+                    is_less = nums[i] > that.nums[i];
+                }
+            }
+
+        } else {
+
+        for(int i = nums.size() - 1; i >= 0; i--) {
+            if(nums[i] != that.nums[i]) {
+                is_less = nums[i] < that.nums[i];
+            }
+        }
+    }
 
         return is_less;
     }
 
     bool operator<=(const Integer &that) {
         bool is_less_or;
-
-        if(is_less_or = nums < that.nums) {
-            return is_less_or = true;
-        }
-        if(is_less_or = nums == that.nums) {
-            return is_less_or = true;
+        if(this->operator==(that)) {
+            return true;
         } else {
-            return is_less_or;
+            is_less_or = this->operator<(that);
         }
+        return is_less_or;
     }
 
     bool operator>(const Integer &that) {
         bool is_greater;
 
-        is_greater = nums > that.nums;
+        if(this->is_negative != that.is_negative) {
+            if(this->is_negative && !that.is_negative) {
+                return false;
+            }
+            else if(!this->is_negative && that.is_negative) {
+                return true;
+            }
+        } 
+
+        if(nums.size() < that.nums.size()) {
+            return false;
+        }
+        if(nums.size() > that.nums.size()) {
+            return true;
+        }
+
+        if(this->is_negative == that.is_negative) {
+
+            for(int i = nums.size() - 1; i >= 0; i--) {
+                if(nums[i] != that.nums[i]) {
+                    is_greater = nums[i] < that.nums[i];
+                }
+            }
+
+        }else {
+
+        for(int i = nums.size() - 1; i >= 0; i--) {
+            if(nums[i] != that.nums[i]) {
+                is_greater = nums[i] > that.nums[i];
+            }
+        }
+
+    }
+
         return is_greater;
     }
 
     bool operator>=(const Integer &that) {
         bool is_greater_or;
-
-        if(is_greater_or = nums > that.nums) {
-            return is_greater_or = true;
-        }
-        if(is_greater_or = nums == that.nums) {
-            return is_greater_or = true;
+        if(this->operator==(that)) {
+            return true;
         } else {
-            return is_greater_or;
+            is_greater_or = this->operator>(that);
         }
+        return is_greater_or;
     }
 };
 
