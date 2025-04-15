@@ -60,7 +60,7 @@ mutable bool is_negative = false;
             result.push_back(nums[i] + '0');
         }
 
-        return Integer(result);
+        return result;
     }
 
     Integer operator+(const Integer &that) const {
@@ -269,7 +269,7 @@ mutable bool is_negative = false;
         return is_equal;
     }
 
-    bool operator!=(const Integer &that) {
+    bool operator!=(const Integer &that) const {
         bool not_equal;
         if(this->is_negative != that.is_negative) {
             return true;
@@ -283,7 +283,7 @@ mutable bool is_negative = false;
 
     }
 
-    bool operator<(const Integer &that) {
+    bool operator<(const Integer &that) const {
         bool is_less;
 
         if(this->is_negative != that.is_negative) {
@@ -296,10 +296,17 @@ mutable bool is_negative = false;
         } 
 
         if(nums.size() > that.nums.size()) {
+            if(this->is_negative) {
+                return true;
+            } else {
             return false;
-        }
-        if(nums.size() < that.nums.size()) {
+            }
+        } else {
+            if(this->is_negative) {
+                return false;
+            } else {
             return true;
+            }
         }
 
         if(this->is_negative) {
@@ -323,7 +330,7 @@ mutable bool is_negative = false;
         return is_less;
     }
 
-    bool operator<=(const Integer &that) {
+    bool operator<=(const Integer &that) const {
         bool is_less_or;
         if(this->operator==(that)) {
             return true;
@@ -333,7 +340,7 @@ mutable bool is_negative = false;
         return is_less_or;
     }
 
-    bool operator>(const Integer &that) {
+    bool operator>(const Integer &that) const {
         bool is_greater;
 
         if(this->is_negative != that.is_negative) {
@@ -345,12 +352,21 @@ mutable bool is_negative = false;
             }
         } 
 
-        if(nums.size() < that.nums.size()) {
-            return false;
-        }
-        if(nums.size() > that.nums.size()) {
-            return true;
-        }
+
+
+            if(nums.size() < that.nums.size()) {
+                if(this->is_negative) {
+                    return true;
+                } else {
+                return false;
+                }
+            } else {
+                if(this->is_negative) {
+                    return false;
+                } else {
+               return true;
+                }
+            }
 
         if(this->is_negative) {
             for(int i = nums.size() - 1; i >= 0; i--) {
@@ -373,7 +389,7 @@ mutable bool is_negative = false;
         return is_greater;
     }
 
-    bool operator>=(const Integer &that) {
+    bool operator>=(const Integer &that) const {
         bool is_greater_or;
         if(this->operator==(that)) {
             return true;
