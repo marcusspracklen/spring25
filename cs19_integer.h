@@ -22,15 +22,33 @@ mutable bool is_negative = false;
     }
 
     Integer(const std::string &input){
-        for (int i = input.size() - 1; i >= 0; i--) {
+        if (input.empty()) {
+            throw std::invalid_argument("Empty input is not valid");
+        }
+
+        int start = 0;
+        if(input[0] == '-') {
+            is_negative = true;
+            start = 1;
+        }
+
+        for(int i = start; i < input.size(); i++) {
             if(!std::isdigit(input[i])) {
-                if(input[i] == '-') {
-                    is_negative = true;
-                }
-            } else{
-                nums.push_back(input[i] - '0');
+                throw std::invalid_argument("Invalid character in input");
             }
         }
+
+       for(int i = input.size() - 1; i >= start; i--) {
+        nums.push_back(input[i] - '0');
+       }
+
+       while (nums.size() > 1 && nums.back() == 0) {
+        nums.pop_back();
+       }
+
+       if(nums.size() == 1 && nums[0] == 0) {
+        is_negative == false;
+       }
     }
 
     operator double() const {
@@ -250,7 +268,7 @@ mutable bool is_negative = false;
         // Handles negatives, the result can only be negative if only one of the nums is negative
         Integer final_result(result);
         final_result.is_negative = (is_negative != that.is_negative);
-        return Integer(final_result);
+        return final_result;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Integer& value) {
