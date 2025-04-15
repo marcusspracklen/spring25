@@ -27,18 +27,18 @@ bool is_negative = false;
         }
 
         int start = 0;
-        if(input[0] == '-') {
+        if (input[0] == '-') {
             is_negative = true;
             start = 1;
         }
 
-        for(int i = start; i < input.size(); i++) {
-            if(!std::isdigit(input[i])) {
+        for (int i = start; i < input.size(); i++) {
+            if (!std::isdigit(input[i])) {
                 throw std::invalid_argument("Invalid character in input");
             }
         }
 
-       for(int i = input.size() - 1; i >= start; i--) {
+       for (int i = input.size() - 1; i >= start; i--) {
         nums.push_back(input[i] - '0');
        }
 
@@ -46,7 +46,7 @@ bool is_negative = false;
         nums.pop_back();
        }
 
-       if(nums.size() == 1 && nums[0] == 0) {
+       if (nums.size() == 1 && nums[0] == 0) {
         is_negative = false;
        }
     }
@@ -60,7 +60,7 @@ bool is_negative = false;
             column = column * 10;
         }
 
-        if(is_negative) {
+        if (is_negative) {
             result *= (-1);
         }
 
@@ -89,19 +89,15 @@ bool is_negative = false;
         bool gonna_be_neg = false;
 
         if(this->is_negative && that.is_negative) {
-            gonna_be_neg = true;
+            return -((-(*this)) + (-that));
         }
 
         if(this->is_negative && !that.is_negative) {
-            Integer lhs = *this;
-            lhs.is_negative = false;
-            return that - lhs;
+            return that - (-(*this));
         }
 
         if(!this->is_negative && that.is_negative) {
-            Integer rhs = that;
-            rhs.is_negative = false;
-            return *this - rhs;
+            return *this - (-that);
         }
 
         for (int i = 0; i < biggest_num; i++) {
@@ -143,10 +139,6 @@ bool is_negative = false;
         bool gonna_be_neg = false;
         bool invert = false;
 
-        if(*this < that) {
-            invert = true;
-        }
-
         if (this->is_negative && !that.is_negative) {
           return -(-(*this) + that);
         }
@@ -157,6 +149,10 @@ bool is_negative = false;
 
         if(this->is_negative && that.is_negative) {
             return -that - (-(*this));
+        }
+
+        if(this->operator<(that)) {
+            invert = true;
         }
 
 
@@ -297,6 +293,10 @@ bool is_negative = false;
     bool operator<(const Integer &that) const {
         bool is_less;
 
+        if(this->operator==(that)) {
+            return false;
+        }
+
         if(this->is_negative != that.is_negative) {
             if(this->is_negative && !that.is_negative) {
                 return true;
@@ -312,7 +312,7 @@ bool is_negative = false;
             } else {
             return false;
             }
-        } else {
+        } if (nums.size() < that.nums.size()) {
             if(this->is_negative) {
                 return false;
             } else {
@@ -327,9 +327,7 @@ bool is_negative = false;
                     break;
                 }
             }
-
         } else {
-
         for(int i = nums.size() - 1; i >= 0; i--) {
             if(nums[i] != that.nums[i]) {
                 is_less = nums[i] < that.nums[i];
@@ -354,6 +352,10 @@ bool is_negative = false;
     bool operator>(const Integer &that) const {
         bool is_greater;
 
+        if(this->operator==(that)) {
+            return false;
+        }
+
         if(this->is_negative != that.is_negative) {
             if(this->is_negative && !that.is_negative) {
                 return false;
@@ -363,15 +365,13 @@ bool is_negative = false;
             }
         } 
 
-
-
             if(nums.size() < that.nums.size()) {
                 if(this->is_negative) {
                     return true;
                 } else {
                 return false;
                 }
-            } else {
+            } if (nums.size() > that.nums.size()) {
                 if(this->is_negative) {
                     return false;
                 } else {
@@ -386,7 +386,6 @@ bool is_negative = false;
                     break;
                 }
             }
-
         } else {
         for(int i = nums.size() - 1; i >= 0; i--) {
             if(nums[i] != that.nums[i]) {
