@@ -8,7 +8,7 @@
 namespace cs19 {
 struct Integer {
 std::vector<int> nums;
-mutable bool is_negative = false;
+bool is_negative = false;
 
 
     Integer() {
@@ -47,7 +47,7 @@ mutable bool is_negative = false;
        }
 
        if(nums.size() == 1 && nums[0] == 0) {
-        is_negative == false;
+        is_negative = false;
        }
     }
 
@@ -93,15 +93,15 @@ mutable bool is_negative = false;
         }
 
         if(this->is_negative && !that.is_negative) {
-            is_negative = false;
-            std::string result = that - *this;
-            return Integer(result);
+            Integer lhs = *this;
+            lhs.is_negative = false;
+            return that - lhs;
         }
 
         if(!this->is_negative && that.is_negative) {
-            that.is_negative = false;
-            std::string result = *this - that;
-            return Integer(result);
+            Integer rhs = that;
+            rhs.is_negative = false;
+            return *this - rhs;
         }
 
         for (int i = 0; i < biggest_num; i++) {
@@ -129,7 +129,7 @@ mutable bool is_negative = false;
         }
 
         if(gonna_be_neg) {
-            result.push_back('-');
+            result.insert(result.begin(), '-');
         }
 
         return Integer(result);
@@ -148,22 +148,15 @@ mutable bool is_negative = false;
         }
 
         if (this->is_negative && !that.is_negative) {
-            is_negative = false;
-            auto abs_this = *this;
-            auto abs_that = that;
-            std::string result = abs_this + abs_that;
-
-            result.push_back('-');
-            return Integer(result);
+          return -(-(*this) + that);
         }
 
-        if(that.is_negative) {
-            that.is_negative = false;
-            auto abs_this = *this;
-            auto abs_that = that;
-            std::string result = abs_this + abs_that;
+        if(!this->is_negative && that.is_negative) {
+           return *this + (-that);
+        }
 
-            return Integer(result);
+        if(this->is_negative && that.is_negative) {
+            return -that - (-(*this));
         }
 
 
