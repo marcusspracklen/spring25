@@ -75,11 +75,13 @@ mutable bool is_negative = false;
         }
 
         if(this->is_negative && !that.is_negative) {
+            is_negative = false;
             std::string result = that - *this;
             return Integer(result);
         }
 
         if(!this->is_negative && that.is_negative) {
+            that.is_negative = false;
             std::string result = *this - that;
             return Integer(result);
         }
@@ -138,6 +140,7 @@ mutable bool is_negative = false;
         }
 
         if(that.is_negative) {
+            that.is_negative = false;
             auto abs_this = *this;
             auto abs_that = that;
             std::string result = abs_this + abs_that;
