@@ -23,6 +23,15 @@ std::string string_to_char(const std::string& hex_string) {
     return result;
 }
 
+std::string to_upper_case(const std::string& input) {
+    std::string upper_str = "";
+    for (char i : input) {
+        upper_str += toupper(i);
+    }
+
+    return upper_str;
+}
+
 int main() {
     std::unordered_map<std::string, std::string> table;
     std::string key_code_point = "";
@@ -74,6 +83,8 @@ int main() {
     // Reads in the user input checks it against the map that was just set up to find the correct hex value
     while (std::getline(std::cin, input)) {
 
+    input = to_upper_case(input);
+
     auto key = table.find(input);
     
     // Checks to make sure that the input key is a value in our map
@@ -81,12 +92,11 @@ int main() {
         // Get the value associated with the key
         auto output_value = key->second;
         auto output = string_to_char(output_value);
-        std::cout << output << "\n";
-    } else {
-        std::cout << input << "\n";
+        std::cout << output;
     }
 
     }
 
+    std::cout << "\n";
 
 }
