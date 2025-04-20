@@ -20,13 +20,18 @@ std::string string_to_char(const std::string& hex_string) {
         result += ch;
     }
 
+
     return result;
 }
 
 std::string to_upper_case(const std::string& input) {
     std::string upper_str = "";
     for (char i : input) {
+        if(std::isalpha(i)) {
         upper_str += toupper(i);
+        } else {
+            upper_str += i;
+        }
     }
 
     return upper_str;
@@ -39,21 +44,10 @@ int main() {
     std::string value = "";
     std::string input = "";
 
-    std::ifstream file("utf8.txt");
-
-    if(file.is_open()) {
-        std::cout << "file open" << "\n";
-    } else {
-        std::cerr << "unable to open file" << "\n";
-    }
-
-    // Read in data from file line by line then process into string types by whitespace
-    int test = 0;
-
+    std::ifstream file("/srv/datasets/utf8.txt");
     std::string file_line = "";
 
     while (std::getline(file, file_line)) {
-        // std::cout << "I read " << file_line << "\n";
 
         // Find the tabs that seperate data values in the line that has just been read in
         auto tab1 = file_line.find('\t');
@@ -63,8 +57,6 @@ int main() {
         key_code_point = file_line.substr(0, tab1);
         key_name = file_line.substr(tab1 + 1, tab2 - (tab1 + 1));
         value = file_line.substr(tab2 + 1, file_line.size());
-
-        // std::cout << key_code_point << " " << key_name << " " << value << "\n" << "\n";
 
         // Set up my map by setting keys and values from the file I am reading from
         table.emplace(key_code_point, value);
@@ -81,22 +73,50 @@ int main() {
     file.close();
 
     // Reads in the user input checks it against the map that was just set up to find the correct hex value
+    int count = 1;
     while (std::getline(std::cin, input)) {
 
-    input = to_upper_case(input);
+        input = to_upper_case(input);
 
-    auto key = table.find(input);
-    
-    // Checks to make sure that the input key is a value in our map
-    if(key != table.end()) {
-        // Get the value associated with the key
-        auto output_value = key->second;
-        auto output = string_to_char(output_value);
-        std::cout << output;
+        // Make sure the input is at least 4 characters long so that it matches my map (avoids edge cases like d1)
+        if (!isalpha(input[2] || !isalpha(input[0]))) {
+            if (input.size() == 2) {
+                input.insert(0, "00");
+            }
+            if (input.size() == 3) {
+                input.insert(0, "0");
+            }
+            if (input.size() == 1) {
+                input.insert(0, "000");
+            }
     }
 
+        auto key = table.find(input);
+        
+        // Checks to make sure that the input key is a value in our map
+        if(key != table.end()) {
+            // Get the value associated with the key
+            auto output_value = key->second;
+            auto output = string_to_char(output_value);
+            std::cout << output;
+        } else {
+
+            // Erase the U+ so all its working with is the code
+            if(input.substr(0, 2) == "U+") {
+                input.erase(0, 2);
+            }
+
+            // Erase any leading 0's
+            input.erase(0, input.find_first_not_of('0'));
+
+            std::string output = input;
+            char leading_str1 = '0';
+            char leading_str2 = 'x';
+            output.push_back(leading_str1 + leading_str2);
+            std::cout << string_to_char(output);
+            //std::cout << "New line " << count << "\n";
+        }
+        count = count + 1;
+
     }
-
-    std::cout << "\n";
-
 }
