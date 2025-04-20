@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+bool word = true;
+
 std::string string_to_char(const std::string& hex_string) {
 
     // Create a string stream so the hex can be treated as a stream of words
@@ -31,6 +33,7 @@ std::string to_upper_case(const std::string& input) {
         upper_str += toupper(i);
         } else {
             upper_str += i;
+            word = false;
         }
     }
 
@@ -79,7 +82,7 @@ int main() {
         input = to_upper_case(input);
 
         // Make sure the input is at least 4 characters long so that it matches my map (avoids edge cases like d1)
-        if (!isalpha(input[2] || !isalpha(input[0]))) {
+        if (!word) {
             if (input.size() == 2) {
                 input.insert(0, "00");
             }
