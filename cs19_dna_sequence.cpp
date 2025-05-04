@@ -1,41 +1,42 @@
 #include "cs19_dna_sequence.h"
 #include <string>
-#include <iostream>
 
 namespace cs19 {
     // Default constructor
     DnaSequence::DnaSequence() : head(nullptr), tail(nullptr), length(0) {}
 
+    // Destructor
+    DnaSequence::~DnaSequence() {
+        realease_nodes();
+    }
+
+    void DnaSequence::realease_nodes() {
+        for (Node* it = head; it != nullptr; ) {
+            Node* next = it->next;
+            delete it;
+            it = next;
+        }
+        head = tail = nullptr;
+        length = 0;
+    }
+
     // Constructor that builds list from a string
     DnaSequence::DnaSequence(const std::string& sequence) : DnaSequence() {
-        // std::cout << "called const. \n";
         for (char i : sequence) {
             push_back(i);
         }
     }
 
-    // FOR TESTING
-    void DnaSequence::print() const {
-        Node* current = head;
-        while (current) {
-          std::cout << current->data;
-          current = current->next;
-        }
-        std::cout << '\n';
-      }
-      
-
     // Equality comparison, only returns true if the sequences are identical
     bool DnaSequence::operator==(const DnaSequence& another) {
-        // std::cout << "called == \n";
-        if(length != another.length) {
+        if (length != another.length) {
             return false;
         }
         Node* a = head;
         Node* b = another.head;
 
         while (a && b) {
-            if(a->data != b->data) {
+            if (a->data != b->data) {
                 return false;
                 a = a->next;
                 b = b->next;
@@ -46,19 +47,15 @@ namespace cs19 {
 
     // Accesses the character at the position pos
     char& DnaSequence::operator[](std::size_t pos) {
-        // std::cout << "called [] \n";
-
-        Node* current = head;
-        for (std::size_t i = 0; i < pos && current; i++) {
-            current = current->next;
+        Node* it = head;
+        for (std::size_t i = 0; i < pos && it; i++) {
+            it = it->next;
         }
-        return current->data;
+        return it->data;
     }
 
     // Adds a character to the end of the list
     void DnaSequence::push_back(char val) {
-        // std::cout << "called pushback \n";
-
         Node* node = new Node(val);
 
         if (!tail) {
@@ -71,7 +68,7 @@ namespace cs19 {
         ++length;
     }
 
-    // Returns size of the list!
+    // Returns size of the list
     std::size_t DnaSequence::size() {
         return length;
     }
@@ -107,28 +104,25 @@ namespace cs19 {
     }
 
     void DnaSequence::remove_all(const DnaSequence& motif) {
-        // std::cout << "called remove all \n";
-
         if (motif.length == 0 || motif.length > this->length) {
             return;
         }
 
-        Node* current = head;
+        Node* it = head;
 
-        while (current) {
-            Node* start = current;
-            Node* check = current;
+        while (it) {
+            Node* start = it;
+            Node* check = it;
             Node* motif_node = motif.head;
 
-            // Match motif to current node
+            // Match motif to it node
             while (check && motif_node && check->data == motif_node->data) {
                 check = check->next;
                 motif_node = motif_node->next;
             }
 
             // Match found
-            if(!motif_node) {
-                Node* before = start->prev;
+            if (!motif_node) {
                 Node* after = check;
 
                 // Delete match
@@ -137,17 +131,14 @@ namespace cs19 {
                     Node* next = to_delete->next;
                     delete to_delete;
                     to_delete = next;
-                    // std::cout << "removed \n";
                 }
 
                 length -= motif.length;
-                current = after;
+                it = after;
             // No match found move forward
             } else {
-                current = current->next;
-                // std::cout << "not removed \n";
+                it = it->next;
             }
         }
     }
-
-}
+}  // namespace cs19
