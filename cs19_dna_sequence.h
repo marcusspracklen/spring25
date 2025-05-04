@@ -1,5 +1,5 @@
-#ifndef CS_19_DnaSequenceUENCE_H
-#define CS_19_DnaSequenceUENCE_H
+#ifndef CS_19_DnaSequenceuence_H
+#define CS_19_DnaSequenceuence_H
 
 #include <string>
 
@@ -7,6 +7,7 @@ namespace cs19 {
 
     class DnaSequence {
     private:
+        // List
         struct Node {
             char data;
             Node* prev;
@@ -23,7 +24,7 @@ namespace cs19 {
         DnaSequence();
         DnaSequence(const std::string& sequence);
 
-
+        void print() const;
         bool operator==(const DnaSequence& other);
         char& operator[](std::size_t pos);
         void remove_all(const DnaSequence& motif);
@@ -35,6 +36,5 @@ namespace cs19 {
     };
 
 }
-
 
 #endif

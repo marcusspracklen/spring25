@@ -1,4 +1,6 @@
 #include "cs19_dna_sequence.h"
+#include <string>
+#include <iostream>
 
 namespace cs19 {
     // Default constructor
@@ -6,14 +8,26 @@ namespace cs19 {
 
     // Constructor that builds list from a string
     DnaSequence::DnaSequence(const std::string& sequence) : DnaSequence() {
+        // std::cout << "called const. \n";
         for (char i : sequence) {
             push_back(i);
         }
     }
 
+    // FOR TESTING
+    void DnaSequence::print() const {
+        Node* current = head;
+        while (current) {
+          std::cout << current->data;
+          current = current->next;
+        }
+        std::cout << '\n';
+      }
+      
 
     // Equality comparison, only returns true if the sequences are identical
     bool DnaSequence::operator==(const DnaSequence& another) {
+        // std::cout << "called == \n";
         if(length != another.length) {
             return false;
         }
@@ -32,6 +46,8 @@ namespace cs19 {
 
     // Accesses the character at the position pos
     char& DnaSequence::operator[](std::size_t pos) {
+        // std::cout << "called [] \n";
+
         Node* current = head;
         for (std::size_t i = 0; i < pos && current; i++) {
             current = current->next;
@@ -41,6 +57,8 @@ namespace cs19 {
 
     // Adds a character to the end of the list
     void DnaSequence::push_back(char val) {
+        // std::cout << "called pushback \n";
+
         Node* node = new Node(val);
 
         if (!tail) {
@@ -53,7 +71,7 @@ namespace cs19 {
         ++length;
     }
 
-    // Returns size of the list
+    // Returns size of the list!
     std::size_t DnaSequence::size() {
         return length;
     }
@@ -62,15 +80,9 @@ namespace cs19 {
         if (that.length == 0) {
             return;
         }
-
-        if (length == 0) {
-            head = that.head;
-            tail = that.tail;
-        } else {
-            tail->next = that.head;
-            that.head->prev = tail;
-            tail = that.tail;
-        }
+        tail->next = that.head;
+        that.head->prev = tail;
+        tail = that.tail;
 
         length += that.length;
 
@@ -83,14 +95,10 @@ namespace cs19 {
             return;
         }
 
-        if (length == 0) {
-            head = that.head;
-            tail = that.tail;
-        } else {
-            that.tail->next = head;
-            head->prev = that.tail;
-            head = that.head;
-        }
+        Node* old_head = head;
+        head = that.head;
+        old_head->prev = that.tail;
+        that.tail->next = old_head;
 
         length += that.length;
 
@@ -99,6 +107,8 @@ namespace cs19 {
     }
 
     void DnaSequence::remove_all(const DnaSequence& motif) {
+        // std::cout << "called remove all \n";
+
         if (motif.length == 0 || motif.length > this->length) {
             return;
         }
@@ -127,6 +137,7 @@ namespace cs19 {
                     Node* next = to_delete->next;
                     delete to_delete;
                     to_delete = next;
+                    // std::cout << "removed \n";
                 }
 
                 length -= motif.length;
@@ -134,6 +145,7 @@ namespace cs19 {
             // No match found move forward
             } else {
                 current = current->next;
+                // std::cout << "not removed \n";
             }
         }
     }
