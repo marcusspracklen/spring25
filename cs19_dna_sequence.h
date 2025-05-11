@@ -17,14 +17,17 @@ class DnaSequence {
 
     Node* head = nullptr;
     Node* tail = nullptr;
-    std::size_t length;
+    std::size_t length = 0;
+
+    friend std::ostream& operator<<(std::ostream& os, const DnaSequence& seq);
+
 
  public:
     DnaSequence();
     ~DnaSequence();
     DnaSequence(const std::string& sequence);
 
-    void realease_nodes();
+    void release_nodes();
     void print() const;
     bool operator==(const DnaSequence& other);
     char& operator[](std::size_t pos);
@@ -33,6 +36,66 @@ class DnaSequence {
     void splice_before(DnaSequence& other);
     void push_back(char val);
     std::size_t size();
+
+
+    class Iterator {
+     public:
+
+      using iterator_category = std::bidirectional_iterator_tag;
+      using value_type        = char;
+      using difference_type   = std::ptrdiff_t;
+      using pointer           = char*;
+      using reference         = char&;
+
+        Iterator(Node* node) : ptr(node) {}
+
+        char& operator*() const { return ptr->data; }
+
+        Iterator& operator++() { ptr = ptr->next; return *this; }
+        Iterator operator--() { ptr = ptr->prev; return *this; }
+
+        bool operator==(const Iterator& other) const { return ptr == other.ptr; }
+        bool operator !=(const Iterator& other) const { return ptr != other.ptr; }
+
+     private:
+        friend class DnaSequence;
+        Node* ptr;
+    };
+
+    // Iterator operations
+    // Points to first element
+    Iterator begin();
+    // Points past the end so we know once we've run off the end of the list
+    Iterator end();
+
+    // Instert a char before pos
+    // Returns an iterator poointing to the newly inserted val
+    Iterator insert(Iterator pos, char val);
+
+    // Insert a range before pos
+    template <typename InputIterator>
+    Iterator insert (Iterator pos, InputIterator first, InputIterator last) {
+      if (first == last) {
+         // Nothing to insert
+         return pos;
+     }
+
+     // Store the return position of pos
+     Iterator result = pos;
+     while (first != last) {
+         // Insert each element before pos
+         result = insert(pos, *first++);
+     }
+     return result;
+    }
+
+    // Remove node at pos
+    Iterator erase(Iterator pos);
+
+    // Splice list into this once before the given pos
+    void splice(Iterator position, DnaSequence& that);
+
 };
+
 }  // namespace cs19
 #endif
