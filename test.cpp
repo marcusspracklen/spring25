@@ -1,69 +1,99 @@
-#include <gmp.h>
-#include <gmpxx.h>
 #include <cassert>
-#include <cmath>
-#include <iostream>
-#include <stdexcept>
 #include <string>
-#include "cs19_integer.h"
+#include "cs19_dna_sequence.h"
  
 int main() {
-  std::string left_str, right_str, op;
-  while (std::cin >> left_str >> op >> right_str) {
-
-    std::cout << cs19::Integer("-101713657699297453207081186099992326985") * cs19::Integer("11") << "\n";
-
-    try {
-      cs19::Integer cs19_left(left_str), cs19_right(right_str);
-      mpz_class mpz_left(left_str), mpz_right(right_str);
-      if (op == "+") {
-        cs19::Integer cs19_result = cs19_left + cs19_right;
-        mpz_class mpz_result = mpz_left + mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(std::string(cs19_result) == mpz_result.get_str());
-      } else if (op == "-") {
-        cs19::Integer cs19_result = cs19_left - cs19_right;
-        mpz_class mpz_result = mpz_left - mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(std::string(cs19_result) == mpz_result.get_str());
-      } else if (op == "*") {
-        cs19::Integer cs19_result = cs19_left * cs19_right;
-        mpz_class mpz_result = mpz_left * mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(std::string(cs19_result) == mpz_result.get_str());
-      } else if (op == "==") {
-        bool cs19_result = cs19_left == cs19_right;
-        bool mpz_result = mpz_left == mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(cs19_result == mpz_result);
-      } else if (op == "!=") {
-        bool cs19_result = cs19_left != cs19_right;
-        bool mpz_result = mpz_left != mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(cs19_result == mpz_result);
-      } else if (op == "<") {
-        bool cs19_result = cs19_left < cs19_right;
-        bool mpz_result = mpz_left < mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(cs19_result == mpz_result);
-      } else if (op == "<=") {
-        bool cs19_result = cs19_left <= cs19_right;
-        bool mpz_result = mpz_left <= mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(cs19_result == mpz_result);
-      } else if (op == ">") {
-        bool cs19_result = cs19_left > cs19_right;
-        bool mpz_result = mpz_left > mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(cs19_result == mpz_result);
-      } else if (op == ">=") {
-        bool cs19_result = cs19_left >= cs19_right;
-        bool mpz_result = mpz_left >= mpz_right;
-        std::cout << cs19_result << '\n';
-        assert(cs19_result == mpz_result);
-      }
-    } catch (std::exception &error) {
-      std::cerr << error.what() << '\n';
-    }
+  // Basic Iteration
+  {
+    cs19::DnaSequence s;
+    assert(s.begin() == s.end());
+  }
+  {
+    cs19::DnaSequence s("GATTACA");
+    assert(std::string(s.begin(), s.end()) == "GATTACA");
+  }
+  {
+    cs19::DnaSequence s("A");
+    auto it = s.begin();
+    assert(it != s.end());
+    assert(*it == 'A');
+    *it = 'C';
+    assert(*it == 'C');
+    ++it;
+    assert(it == s.end());
+    assert(s == cs19::DnaSequence("C"));
+  }
+  // Inserting
+  {
+    cs19::DnaSequence s("CT");
+    auto it = s.begin();
+    ++it;
+    it = s.insert(it, 'A');
+    assert(*it == 'A');
+    assert(s == cs19::DnaSequence("CAT"));
+    ++it;
+    assert(*it == 'T');
+    ++it;
+    assert(it == s.end());
+  }
+  {
+    cs19::DnaSequence s1("GA");
+    std::string insertion("ATTAC");
+    auto it = s1.begin();
+    ++it;
+    it = s1.insert(it, insertion.cbegin(), insertion.cend());
+    assert(s1 == cs19::DnaSequence("GATTACA"));
+    assert(*it == 'A');
+    ++it;
+    assert(*it == 'T');
+  }
+  // Erasing
+  {
+    cs19::DnaSequence s("GGATTTACAA");
+    auto it = s.erase(s.begin());
+    assert(std::string(s.begin(), s.end()) == "GATTTACAA");
+    ++it;
+    ++it;
+    it = s.erase(it);
+    assert(std::string(s.begin(), s.end()) == "GATTACAA");
+    ++it;
+    ++it;
+    ++it;
+    ++it;
+    ++it;
+    it = s.erase(it);
+    assert(std::string(s.begin(), s.end()) == "GATTACA");
+    assert(it == s.end());
+  }
+  // Splicing
+  {
+    cs19::DnaSequence s1("A");
+    cs19::DnaSequence s2("GATTAC");
+    s1.splice(s1.begin(), s2);
+    assert(s1 == cs19::DnaSequence("GATTACA"));
+    assert(s2 == cs19::DnaSequence());
+    assert(s2.size() == 0);
+  }
+  {
+    cs19::DnaSequence s1("G");
+    cs19::DnaSequence s2("ATTACA");
+    s1.splice(s1.end(), s2);
+    assert(s1 == cs19::DnaSequence("GATTACA"));
+    assert(s2 == cs19::DnaSequence());
+    assert(s2.size() == 0);
+  }
+  {
+    cs19::DnaSequence s1("GA");
+    cs19::DnaSequence s2("ATTA");
+    cs19::DnaSequence s3("C");
+    auto it = s1.begin();
+    ++it;
+    s1.splice(it, s2);
+    s1.splice(it, s3);
+    assert(s1 == cs19::DnaSequence("GATTACA"));
+    assert(s2 == cs19::DnaSequence());
+    assert(s2.size() == 0);
+    assert(s3 == cs19::DnaSequence());
+    assert(s3.size() == 0);
   }
 }
