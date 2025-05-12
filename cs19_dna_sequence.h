@@ -40,22 +40,47 @@ class DnaSequence {
 
     class Iterator {
      public:
-
-      using iterator_category = std::bidirectional_iterator_tag;
-      using value_type        = char;
-      using difference_type   = std::ptrdiff_t;
-      using pointer           = char*;
-      using reference         = char&;
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type        = char;
+        using difference_type   = std::ptrdiff_t;
+        using pointer           = char*;
+        using reference         = char&;
 
         Iterator(Node* node) : ptr(node) {}
 
-        char& operator*() const { return ptr->data; }
+        char& operator*() const { 
+            if (!ptr) {
+                throw std::__throw_out_of_range;
+            }
+            return ptr->data; 
+        }
 
-        Iterator& operator++() { ptr = ptr->next; return *this; }
-        Iterator operator--() { ptr = ptr->prev; return *this; }
+        Iterator& operator++() { 
+            if (!ptr) {
+                return *this;
+            }
+            if (!ptr->next) {
+                ptr = nullptr;
+            }
+            else {
+                ptr = ptr->next; 
+                return *this; 
+            }
+        }
+        Iterator& operator--() { 
+            if (!ptr) {
+                return *this;
+            }
+            if (!ptr->prev) {
+                ptr = nullptr;
+            } else {
+                ptr = ptr->prev; 
+                return *this; 
+            }
+        }
 
         bool operator==(const Iterator& other) const { return ptr == other.ptr; }
-        bool operator !=(const Iterator& other) const { return ptr != other.ptr; }
+        bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
 
      private:
         friend class DnaSequence;
