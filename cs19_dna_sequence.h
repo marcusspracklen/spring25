@@ -43,7 +43,7 @@ class DnaSequence {
     void push_back(char val);
     std::size_t size();
 
-    DnaSequence& operator=(DnaSequence& other);
+    DnaSequence& operator=(DnaSequence other);
 
     class Iterator {
      public:

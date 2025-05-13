@@ -286,7 +286,7 @@ namespace cs19 {
         that.length = 0;
     }
 
-    DnaSequence& DnaSequence::operator=(DnaSequence& other) {
+    DnaSequence& DnaSequence::operator=(DnaSequence other) {
         Node* temph = head;
 
         head = other.head;
@@ -297,7 +297,7 @@ namespace cs19 {
         tail = other.tail;
         other.tail = tempt;
 
-        std::size_t templ = other.length;
+        std::size_t templ = length;
 
         length = other.length;
         other.length = templ;
