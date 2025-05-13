@@ -1,307 +1,134 @@
-#include "cs19_dna_sequence.h"
+#ifndef CS_19_DnaSequence_H
+#define CS_19_DnaSequence_H
+
 #include <string>
+#include <stdexcept>
 
 namespace cs19 {
-    // Default constructor
-    DnaSequence::DnaSequence() : head(nullptr), tail(nullptr), length(0) {}
 
-    // Destructor
-    DnaSequence::~DnaSequence() {
-        release_nodes();
-    }
+class DnaSequence {
+ private:
+    struct Node {
+        char data;
+        Node* prev;
+        Node* next;
 
-    void DnaSequence::release_nodes() {
-        for (Node* it = head; it != nullptr; ) {
-            Node* next = it->next;
-            delete it;
-            it = next;
+        Node(char d) : data(d), prev(nullptr), next(nullptr) {}
+    };
+
+    Node* head = nullptr;
+    Node* tail = nullptr;
+    std::size_t length = 0;
+
+    friend std::ostream& operator<<(std::ostream& os, const DnaSequence& seq);
+
+
+ public:
+    DnaSequence();
+    ~DnaSequence();
+    DnaSequence(const DnaSequence& other) : DnaSequence() {
+        for (Node* i = other.head; i; i = i->next) {
+            push_back(i->data);
         }
-        head = tail = nullptr;
-        length = 0;
     }
+    DnaSequence(const std::string& sequence);
 
-    // Constructor that builds list from a string
-    DnaSequence::DnaSequence(const std::string& sequence) : DnaSequence() {
-        for (char i : sequence) {
-            push_back(i);
-        }
-    }
+    void release_nodes();
+    void print() const;
+    bool operator==(const DnaSequence& other);
+    char& operator[](std::size_t pos);
+    void remove_all(const DnaSequence& motif);
+    void splice_after(DnaSequence& other);
+    void splice_before(DnaSequence& other);
+    void push_back(char val);
+    std::size_t size();
 
-    // Equality comparison, only returns true if the sequences are identical
-    bool DnaSequence::operator==(const DnaSequence& another) {
-        if (length != another.length) {
-            return false;
-        }
-        Node* a = head;
-        Node* b = another.head;
+    DnaSequence& operator=(DnaSequence other);
 
-        while (a && b) {
-            if (a->data != b->data) {
-                return false;
+    class Iterator {
+     public:
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type        = char;
+        using difference_type   = std::ptrdiff_t;
+        using pointer           = char*;
+        using reference         = char&;
+
+        Iterator(Node* node) : ptr(node) {}
+
+        Iterator& operator=(const Iterator& other) {
+            if (this != &other) {
+                ptr = other.ptr;
             }
-            a = a->next;
-            b = b->next;
-        }
-        return true;
-    }
-
-    // Accesses the character at the position pos
-    char& DnaSequence::operator[](std::size_t pos) {
-        Node* it = head;
-        if (pos >= length) {
-            throw std::out_of_range("Out of range");
-        }
-        for (std::size_t i = 0; i < pos && it; i++) {
-            it = it->next;
-        }
-        return it->data;
-    }
-
-    // Adds a character to the end of the list
-    void DnaSequence::push_back(char val) {
-        Node* node = new Node(val);
-
-        if (!tail) {
-            head = tail = node;
-        } else {
-            tail->next = node;
-            node->prev = tail;
-            tail = node;
-        }
-        ++length;
-    }
-
-    // Returns size of the list
-    std::size_t DnaSequence::size() {
-        return length;
-    }
-
-    void DnaSequence::splice_after(DnaSequence& that) {
-        if (that.length == 0) {
-            return;
-        }
-        if (this->length == 0) {
-            this->head = that.head;
-            this->tail = that.tail;
-            this->length = that.length;
-        } else {
-            tail->next = that.head;
-            that.head->prev = tail;
-            tail = that.tail;
-            length += that.length;
+            return *this;
         }
 
-        that.head = that.tail = nullptr;
-        that.length = 0;
-    }
-
-    void DnaSequence::splice_before(DnaSequence& that) {
-        if (that.length == 0) {
-            return;
-        }
-
-        if (this->length == 0) {
-            this->head = that.head;
-            this->tail = that.tail;
-            this->length = that.length;
-        } else {
-            Node* old_head = head;
-            head = that.head;
-            old_head->prev = that.tail;
-            that.tail->next = old_head;
-            length += that.length;
-        }
-
-        that.head = that.tail = nullptr;
-        that.length = 0;
-    }
-
-    void DnaSequence::remove_all(const DnaSequence& motif) {
-        if (motif.length == 0 || motif.length > this->length) {
-            return;
-        }
-
-        Node* it = head;
-
-        while (it) {
-            Node* start = it;
-            Node* check = it;
-            Node* motif_node = motif.head;
-
-            // Match motif to node
-            while (check && motif_node && check->data == motif_node->data) {
-                check = check->next;
-                motif_node = motif_node->next;
+        char& operator*() const {
+            if (!ptr) {
+                throw std::out_of_range("Target out of range");
             }
+            return ptr->data;
+        }
 
-            // Match found
-            if (!motif_node) {
-                Node* before = start->prev;
-                Node* after = check;
-
-                // Delete match
-                Node* to_delete = start;
-                for (std::size_t i = 0; i < motif.length; i++) {
-                    Node* next = to_delete->next;
-                    delete to_delete;
-                    to_delete = next;
-                }
-
-                // Reconnect pointers
-                if (before) {
-                    before->next = after;
-                } else {
-                    head = after;
-                }
-
-                if (after) {
-                    after->prev = before;
-                } else {
-                    tail = before;
-                }
-
-                length -= motif.length;
-                it = after;
-            // No match found move forward
-            } else {
-                it = it->next;
+        Iterator& operator++() {
+            if (ptr) {
+                ptr = ptr->next;
             }
+                return *this;
         }
-    }
-
-    // Return starting address of the list
-    DnaSequence::Iterator DnaSequence::begin() {
-        return Iterator(head);
-    }
-
-    // Returns past the end of the list
-    DnaSequence::Iterator DnaSequence::end() {
-        return Iterator(nullptr);
-    }
-
-    // Inserts a value before the node pointed to by pos
-    DnaSequence::Iterator DnaSequence::insert(Iterator pos, char val) {
-        Node* new_node = new Node(val);
-        Node* current = pos.ptr;
-
-        if (!current) {
-            if (!tail) {
-                // Checks in case the list is empty
-                head = tail = new_node;
-            } else {
-                // Inserts at the end if list is not empty
-                tail->next = new_node;
-                new_node->prev = tail;
-                tail = new_node;
+        Iterator& operator--() {
+            if (ptr) {
+                ptr = ptr->prev;
             }
-        } else {
-            // Inserts before a specific node
-            // Links new_node between current->prev and current
-            new_node->next = current;
-            new_node->prev = current->prev;
-            if (current->prev) {
-                // Checks to make sure there is a node before current
-                current->prev->next = new_node;
-            } else {
-                // Inserts at the head
-                head = new_node;
-            }
-            // Update current->prev's pointer
-            current->prev = new_node;
+                return *this;
         }
 
-        ++length;
-        return Iterator(new_node);
+        bool operator==(const Iterator& other) const { return ptr == other.ptr; }
+        bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
+
+     private:
+        friend class DnaSequence;
+        Node* ptr;
+    };
+
+    // Iterator operations
+    // Points to first element
+    Iterator begin();
+    // Points past the end so we know once we've run off the end of the list
+    Iterator end();
+
+    // Instert a char before pos
+    // Returns an iterator poointing to the newly inserted val
+    Iterator insert(Iterator pos, char val);
+
+    // Insert a range before pos
+    template <typename InputIterator>
+    Iterator insert(Iterator pos, InputIterator first, InputIterator last) {
+      if (first == last) {
+         // Nothing to insert
+         return pos;
+     }
+
+     // Store the return position of pos
+     Iterator result = pos;
+     int count = 0;
+     Iterator it = nullptr;
+     while (first != last) {
+        // Insert each element before pos
+        result = insert(pos, *first++);
+        if (count == 0) {
+            it = result;
+        }
+        count++;
+     }
+     return it;
     }
 
-    // Removes the node pointed to by pos
-    DnaSequence::Iterator DnaSequence::erase(Iterator pos) {
-        Node* current = pos.ptr;
-        if (!current) {
-            // Nothing to erase
-            return end();
-        }
+    // Remove node at pos
+    Iterator erase(Iterator pos);
 
-        Node* before = current->prev;
-        Node* after = current->next;
+    // Splice list into this once before the given pos
+    void splice(Iterator position, DnaSequence& that);
+};
 
-        if (current == head) {
-            head = after;
-        }
-        if (current == tail) {
-            tail = before;
-        }
-        if (before) {
-            // Update the link from the node before
-            before->next = after;
-        }
-        if (after) {
-            // Update link from node after
-            after->prev = before;
-        }
-
-        delete current;
-        --length;
-        return Iterator(after);
-    }
-
-    // Splices in all nodes from that into this before pos
-    void DnaSequence::splice(Iterator pos, DnaSequence& that) {
-        if (that.length == 0) {
-            // Nothing to splice
-            return;
-        }
-
-        // Node before where splice
-        Node* insert_point = pos.ptr;
-        if (!insert_point) {
-            // If we're at the end of the list splice at the end
-            splice_after(that);
-            return;
-        }
-        if (insert_point == head) {
-            splice_before(that);
-            return;
-        }
-
-        Node* before = insert_point->prev;
-
-        if (before) {
-            // Splices in the middle of the list
-            before->next = that.head;
-        } else {
-            // Splices at the very beginning
-            head = that.head;
-        }
-
-        // Reconnect nodes to complete the splice
-        that.head->prev = before;
-        insert_point->prev = that.tail;
-        that.tail->next = insert_point;
-
-        length += that.length;
-
-        // Clear that
-        that.head = that.tail = nullptr;
-        that.length = 0;
-    }
-
-    DnaSequence& DnaSequence::operator=(DnaSequence other) {
-        Node* temph = head;
-
-        head = other.head;
-        other.head = temph;
-
-        Node* tempt = tail;
-
-        tail = other.tail;
-        other.tail = tempt;
-
-        std::size_t templ = length;
-
-        length = other.length;
-        other.length = templ;
-
-        return *this;
-    }
 }  // namespace cs19
+#endif
