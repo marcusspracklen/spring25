@@ -212,10 +212,10 @@ namespace cs19 {
         Node* before = current->prev;
         Node* after = current->next;
 
-        if (current = head) {
+        if (current == head) {
             head = after;
         }
-        if (current = tail) {
+        if (current == tail) {
             tail = before;
         }
         if (before) {
