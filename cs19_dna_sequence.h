@@ -49,24 +49,24 @@ class DnaSequence {
 
         Iterator(Node* node) : ptr(node) {}
 
-        char& operator*() const { 
+        char& operator*() const {
             if (!ptr) {
                 throw std::out_of_range("Target out of range");
             }
-            return ptr->data; 
+            return ptr->data;
         }
 
-        Iterator& operator++() { 
+        Iterator& operator++() {
             if (ptr) {
                 ptr = ptr->next;
             }
-                return *this; 
+                return *this;
         }
-        Iterator& operator--() { 
+        Iterator& operator--() {
             if (ptr) {
                 ptr = ptr->prev;
-            } 
-                return *this; 
+            }
+                return *this;
         }
 
         bool operator==(const Iterator& other) const { return ptr == other.ptr; }
@@ -89,7 +89,7 @@ class DnaSequence {
 
     // Insert a range before pos
     template <typename InputIterator>
-    Iterator insert (Iterator pos, InputIterator first, InputIterator last) {
+    Iterator insert(Iterator pos, InputIterator first, InputIterator last) {
       if (first == last) {
          // Nothing to insert
          return pos;
@@ -115,7 +115,6 @@ class DnaSequence {
 
     // Splice list into this once before the given pos
     void splice(Iterator position, DnaSequence& that);
-
 };
 
 }  // namespace cs19
