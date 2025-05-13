@@ -1,5 +1,5 @@
-#ifndef CS_19_DnaSequenceuence_H
-#define CS_19_DnaSequenceuence_H
+#ifndef CS_19_DnaSequence_H
+#define CS_19_DnaSequence_H
 
 #include <string>
 #include <stdexcept>

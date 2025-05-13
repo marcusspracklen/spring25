@@ -212,20 +212,19 @@ namespace cs19 {
         Node* before = current->prev;
         Node* after = current->next;
 
+        if (current = head) {
+            head = after;
+        }
+        if (current = tail) {
+            tail = before;
+        }
         if (before) {
             // Update the link from the node before
             before->next = after;
-        } else {
-            // If head is going to be erased update the head pointer
-            head = after;
         }
-        
         if (after) {
             // Update link from node after
             after->prev = before;
-        } else {
-            // If tail is going to be erased update the tail ptr
-            tail = before;
         }
 
         delete current;
