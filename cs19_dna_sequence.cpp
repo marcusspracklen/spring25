@@ -285,4 +285,23 @@ namespace cs19 {
         that.head = that.tail = nullptr;
         that.length = 0;
     }
+
+    DnaSequence& DnaSequence::operator=(DnaSequence& other) {
+        Node* temph = head;
+
+        head = other.head;
+        other.head = temph;
+
+        Node* tempt = tail;
+
+        tail = other.tail;
+        other.tail = tempt;
+
+        std::size_t templ = other.length;
+
+        length = other.length;
+        other.length = templ;
+
+        return *this;
+    }
 }  // namespace cs19

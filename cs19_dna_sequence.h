@@ -43,15 +43,7 @@ class DnaSequence {
     void push_back(char val);
     std::size_t size();
 
-    DnaSequence& operator=(const DnaSequence& another) {
-        this->release_nodes();
-        Node* that_node = another.head;
-        while (that_node) {
-            this->push_back(that_node->data);
-            that_node = that_node->next;
-        }
-        return *this;
-    }
+    DnaSequence& operator=(DnaSequence& other);
 
     class Iterator {
      public:
