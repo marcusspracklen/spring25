@@ -97,11 +97,17 @@ class DnaSequence {
 
      // Store the return position of pos
      Iterator result = pos;
+     int count = 0;
+     Iterator it = nullptr;
      while (first != last) {
-         // Insert each element before pos
-         result = insert(pos, *first++);
+        // Insert each element before pos
+        result = insert(pos, *first++);
+        if (count == 0) {
+            it = result;
+        }
+        count++;
      }
-     return result;
+     return it;
     }
 
     // Remove node at pos

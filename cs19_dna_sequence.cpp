@@ -230,7 +230,12 @@ namespace cs19 {
 
         delete current;
         --length;
-        return Iterator(after);
+
+        if (after) {
+            return Iterator(after);
+        } else {
+            return Iterator(before);
+        }
     }
 
     // Splices in all nodes from that into this before pos
