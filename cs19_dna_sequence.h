@@ -2,6 +2,7 @@
 #define CS_19_DnaSequenceuence_H
 
 #include <string>
+#include <stdexcept>
 
 namespace cs19 {
 
@@ -50,33 +51,22 @@ class DnaSequence {
 
         char& operator*() const { 
             if (!ptr) {
-                throw std::__throw_out_of_range;
+                throw std::out_of_range("Target out of range");
             }
             return ptr->data; 
         }
 
         Iterator& operator++() { 
-            if (!ptr) {
-                return *this;
+            if (ptr) {
+                ptr = ptr->next;
             }
-            if (!ptr->next) {
-                ptr = nullptr;
-            }
-            else {
-                ptr = ptr->next; 
                 return *this; 
-            }
         }
         Iterator& operator--() { 
-            if (!ptr) {
-                return *this;
-            }
-            if (!ptr->prev) {
-                ptr = nullptr;
-            } else {
-                ptr = ptr->prev; 
+            if (ptr) {
+                ptr = ptr->prev;
+            } 
                 return *this; 
-            }
         }
 
         bool operator==(const Iterator& other) const { return ptr == other.ptr; }

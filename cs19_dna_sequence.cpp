@@ -38,9 +38,9 @@ namespace cs19 {
         while (a && b) {
             if (a->data != b->data) {
                 return false;
-                a = a->next;
-                b = b->next;
             }
+            a = a->next;
+            b = b->next;
         }
         return true;
     }
