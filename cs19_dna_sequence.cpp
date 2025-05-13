@@ -225,12 +225,6 @@ namespace cs19 {
         Node* before = current->prev;
         Node* after = current->next;
 
-        if (current == head) {
-            head = after;
-        }
-        if (current == tail) {
-            tail = before;
-        }
         if (before) {
             // Update the link from the node before
             before->next = after;
@@ -240,9 +234,33 @@ namespace cs19 {
             after->prev = before;
         }
 
+        if (current == head) {
+            head = after;
+            if (head) {
+                head->prev = nullptr;
+            }
+        }
+        if (current == tail) {
+            tail = before;
+            if (tail) {
+                tail->next = nullptr;
+            }
+        }
+
+        current->prev = current->next = nullptr;
+
         delete current;
         --length;
-        return Iterator(after);
+        if (length == 0) {
+            head = tail = nullptr;
+            return Iterator(after, true);
+        }
+        if (after) {
+            return Iterator(after, false);
+        }
+        if (!after) {
+            return Iterator(tail, true);
+        }
     }
 
     // Splices in all nodes from that into this before pos

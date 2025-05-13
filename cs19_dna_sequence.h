@@ -55,7 +55,9 @@ class DnaSequence {
 
         Iterator(Node* node) : ptr(node) {}
 
-        Iterator& operator=(const Iterator& other) {
+        Iterator(Node* i, bool past_end = false) : ptr(i), at_end(past_end) {}
+
+        Iterator& operator=(Iterator other) {
             if (this != &other) {
                 ptr = other.ptr;
             }
@@ -69,17 +71,44 @@ class DnaSequence {
             return ptr->data;
         }
 
+        // Adding prefix as shown in lecture notes
         Iterator& operator++() {
-            if (ptr) {
+            if (at_end) {
+                throw std::out_of_range("Runs off the end");
+            }
+            if (ptr->next == nullptr) {
+                at_end = true;
+            } else {
                 ptr = ptr->next;
             }
-                return *this;
+            return *this;
         }
+
+        // Adding postfix as discussed in lecture examples
+        Iterator operator++(int) {
+            Iterator tmp(*this);
+            this->operator++();
+            return tmp;
+        }
+
+        // Adding prefix as shown in lecture notes
         Iterator& operator--() {
-            if (ptr) {
+            if (at_end) {
+                at_end = false;
+            } else {
+                if (ptr == nullptr) {
+                    throw std::out_of_range("-- on a nullptr");
+                }
                 ptr = ptr->prev;
             }
-                return *this;
+            return *this;
+        }
+
+        // Adding postfix as discussed in lecture examples
+        Iterator operator--(int) {
+            Iterator tmp(*this);
+            this->operator--();
+            return tmp;
         }
 
         bool operator==(const Iterator& other) const { return ptr == other.ptr; }
@@ -88,6 +117,7 @@ class DnaSequence {
      private:
         friend class DnaSequence;
         Node* ptr;
+        bool at_end = false;
     };
 
     // Iterator operations
