@@ -53,8 +53,6 @@ class DnaSequence {
         using pointer           = char*;
         using reference         = char&;
 
-        Iterator(Node* node) : ptr(node) {}
-
         Iterator(Node* i, bool past_end = false) : ptr(i), at_end(past_end) {}
 
         Iterator& operator=(Iterator other) {
