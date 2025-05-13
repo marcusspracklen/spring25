@@ -26,6 +26,11 @@ class DnaSequence {
  public:
     DnaSequence();
     ~DnaSequence();
+    DnaSequence(const DnaSequence& other) : DnaSequence() {
+        for (Node* i = other.head; i; i = i->next) {
+            push_back(i->data);
+        }
+    }
     DnaSequence(const std::string& sequence);
 
     void release_nodes();
@@ -38,6 +43,15 @@ class DnaSequence {
     void push_back(char val);
     std::size_t size();
 
+    DnaSequence& operator=(const DnaSequence& another) {
+        this->release_nodes();
+        Node* that_node = another.head;
+        while (that_node) {
+            this->push_back(that_node->data);
+            that_node = that_node->next;
+        }
+        return *this;
+    }
 
     class Iterator {
      public:
@@ -48,6 +62,13 @@ class DnaSequence {
         using reference         = char&;
 
         Iterator(Node* node) : ptr(node) {}
+
+        Iterator& operator=(const Iterator& other) {
+            if (this != &other) {
+                ptr = other.ptr;
+            }
+            return *this;
+        }
 
         char& operator*() const {
             if (!ptr) {
