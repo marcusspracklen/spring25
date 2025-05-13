@@ -48,6 +48,9 @@ namespace cs19 {
     // Accesses the character at the position pos
     char& DnaSequence::operator[](std::size_t pos) {
         Node* it = head;
+        if (pos >= length) {
+            throw std::out_of_range("Out of range");
+        }
         for (std::size_t i = 0; i < pos && it; i++) {
             it = it->next;
         }
@@ -77,11 +80,16 @@ namespace cs19 {
         if (that.length == 0) {
             return;
         }
-        tail->next = that.head;
-        that.head->prev = tail;
-        tail = that.tail;
-
-        length += that.length;
+        if (this->length == 0) {
+            this->head = that.head;
+            this->tail = that.tail;
+            this->length = that.length;
+        } else {
+            tail->next = that.head;
+            that.head->prev = tail;
+            tail = that.tail;
+            length += that.length;
+        }
 
         that.head = that.tail = nullptr;
         that.length = 0;
@@ -92,12 +100,17 @@ namespace cs19 {
             return;
         }
 
-        Node* old_head = head;
-        head = that.head;
-        old_head->prev = that.tail;
-        that.tail->next = old_head;
-
-        length += that.length;
+        if (this->length == 0) {
+            this->head = that.head;
+            this->tail = that.tail;
+            this->length = that.length;
+        } else {
+            Node* old_head = head;
+            head = that.head;
+            old_head->prev = that.tail;
+            that.tail->next = old_head;
+            length += that.length;
+        }
 
         that.head = that.tail = nullptr;
         that.length = 0;
@@ -244,6 +257,10 @@ namespace cs19 {
         if (!insert_point) {
             // If we're at the end of the list splice at the end
             splice_after(that);
+            return;
+        }
+        if (insert_point == head) {
+            splice_before(that);
             return;
         }
 
