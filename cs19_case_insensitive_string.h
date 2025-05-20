@@ -9,8 +9,7 @@
 namespace cs19 {
 
 class CaseInsensitiveString {
-public:
-
+ public:
     // Constructors
     CaseInsensitiveString() = default;
     CaseInsensitiveString(const std::string& str);
@@ -30,14 +29,24 @@ public:
     friend std::istream& operator>>(std::istream& in, CaseInsensitiveString& s);
     friend std::ostream& operator<<(std::ostream& out, const CaseInsensitiveString& s);
 
-    friend std::string::iterator begin();
-    friend std::string::iterator end();
+    std::string::iterator begin() {
+        return original_.begin();
+    }
+    std::string::iterator end() {
+        return original_.end();
+    }
+    std::string::const_iterator begin() const {
+        return original_.begin();
+    }
+    std::string::const_iterator end() const {
+        return original_.end();
+    }
 
-private:
+ private:
     std::string original_;
 
     static std::string to_lower(const std::string& s);
 };
 
-} // namespace cs19
+}  // namespace cs19
 #endif
