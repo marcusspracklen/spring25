@@ -75,14 +75,16 @@ class NGramPredictor {
     template <typename Iterator>
     std::vector<std::vector<std::string>> suggestions(Iterator begin, Iterator end) const {
         auto current = root_;
+        std::vector<std::string> prefix;
 
         // Traverse the prefix path to reach our starting node
-        for (; begin!= end; ++begin) {
+        for (Iterator it = begin; it != end; ++it) {
             std::shared_ptr<Node> next = nullptr;
+            prefix.push_back(*it);
 
             // Find matching child node
             for (auto& child : current->children_) {
-                if (child->key_ == *begin) {
+                if (child->key_ == *it) {
                     next = child;
                     break;
                 }
@@ -106,19 +108,36 @@ class NGramPredictor {
             auto rank_of = [&](const std::vector<std::string>& path) {
                 Node* node = current.get();
                 for (const auto& word : path) {
+                    bool found_word = false;
                     for (auto& child : node->children_) {
                         if (child->key_ == word) {
                             node = child.get();
+                            found_word = true;
                             break;
                         }
                     }
+                    if (!found_word) return 0;
                 }
                 return node->rank_;
             };
 
-            return rank_of(a) > rank_of(b);
+            int rank_a = rank_of(a);
+            int rank_b = rank_of(b);
+
+            if (rank_a != rank_b) {
+                return rank_a > rank_b;
+            }
+
+            return rank_a < rank_b;
         });
-            return results; 
+
+        std::vector<std::vector<std::string>> full_results;
+        for (const auto& suffix : results) {
+            std::vector<std::string> full_ngram = prefix;
+            full_ngram.insert(full_ngram.end(), suffix.begin(), suffix.end());
+            full_results.push_back(full_ngram);
+        }
+            return full_results; 
         }
 
         // Returns the total number of ngrams added
